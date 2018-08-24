@@ -1,2 +1,5 @@
 *~
 *.pyc
+Pipfile
+Pipfile.lock
+*.egg-info
