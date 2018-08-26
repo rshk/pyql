@@ -11,7 +11,7 @@ const QUERY = gql`
 
 const SUBS = gql`
     subscription countSeconds {
-        countSeconds(upTo: 10)
+        countSeconds(upTo: 50)
     }
 `;
 
@@ -31,9 +31,8 @@ export default function GqlQueryDemo() {
         <div>
             <Subscription subscription={SUBS}>
                 {({data}) => {
-                     console.log('SUBSCRIPTION', data);
                      if (!data) {
-                         return '---';
+                         return 'Connecting...';
                      }
                      const {countSeconds} = data;
                      return `Seconds: ${countSeconds}`;
