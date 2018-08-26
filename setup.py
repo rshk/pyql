@@ -13,6 +13,19 @@ if os.path.exists('CHANGELOG.rst'):
         longdesc += "\n\n" + fp.read()
 
 
+INSTALL_REQUIRES = [
+    'sanic >= 0.7.0',
+    'sanic-graphql',
+    'graphene >= 2.0',
+    'graphql-ws >= 0.2.0',
+]
+
+DEPENDENCY_LINKS = [
+    'http://github.com/channelcat/sanic/tarball/30e6a310f132752669a74927530e8bc52a51e98e#egg=sanic-0.7.0',
+    'http://github.com/graphql-python/graphql-ws/tarball/660a0e0d6de66416e57179c2633795de5823d347#egg=graphql-ws-0.2.0',
+]
+
+
 setup(
     name='PyQL',
     version=version,
@@ -23,11 +36,8 @@ setup(
     author_email='samuele.santi@reinventsoftware.io',
     description='',
     long_description=longdesc,
-    install_requires=[
-        'sanic',
-        'sanic-graphql',
-        'graphene>=2.0',
-    ],
+    install_requires=INSTALL_REQUIRES,
+    dependency_links=DEPENDENCY_LINKS,
     # tests_require=tests_require,
     # test_suite='tests',
     classifiers=[
