@@ -1,6 +1,7 @@
-from sanic import Sanic
-from sanic_graphql import GraphQLView
 from graphql_ws.websockets_lib import WsLibSubscriptionServer
+from sanic import Sanic
+from sanic_cors import CORS
+from sanic_graphql import GraphQLView
 
 
 def pyql(schema):
@@ -8,6 +9,8 @@ def pyql(schema):
     """
 
     app = Sanic()
+
+    CORS(app, automatic_options=True)
 
     app.add_route(GraphQLView.as_view(
         schema=schema, graphiql=True), '/graphql')
