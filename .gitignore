@@ -3,3 +3,4 @@
 Pipfile
 Pipfile.lock
 *.egg-info
+/dist
