@@ -13,7 +13,7 @@ import {doLogout, getToken} from './auth';
 
 
 // TODO load from process.env.API_URL or similar
-const API_URL = process.env.API_URL || 'https://graphqlbin.org/graphql';
+const API_URL = process.env.API_URL || 'http://localhost:5000/graphql';
 const WEBSOCKET_URL = (
     API_URL.replace(/^http(s?):\/\/(.*)/, 'ws$1://$2')
     .replace(/\/graphql$/, '/subscriptions')  // HACK

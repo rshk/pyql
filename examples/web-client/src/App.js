@@ -1,6 +1,11 @@
 import React from 'react';
 import {Component} from 'react';
+
+import GqlQueryDemo from 'ui/gql-query-demo';
+import ApolloProvider from 'lib/apollo-provider';
+
 import './App.css';
+
 
 export default class App extends Component {
     state = {
@@ -9,9 +14,13 @@ export default class App extends Component {
 
     render() {
         return (
-            <div className="App">
-                <h1>Welcome to {this.state.name}</h1>
-            </div>
+            <ApolloProvider>
+                <div className="App">
+                    <h1>Welcome to {this.state.name}</h1>
+
+                    <GqlQueryDemo />
+                </div>
+            </ApolloProvider>
         );
     }
 }
