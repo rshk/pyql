@@ -14,12 +14,28 @@ if os.path.exists('CHANGELOG.rst'):
 
 
 INSTALL_REQUIRES = [
-    'sanic >= 0.7.0',
-    'sanic-graphql',
-    'sanic-cors >= 0.9.4',
-    'graphene >= 2.0',
-    'graphql-ws >= 0.2.0',
+
+    # GraphQL schema definition
+    'graphql-core',
+
+    # ISO8601 date parsing
+    'aniso8601',
 ]
+
+
+EXTRAS_REQUIRE = {
+    'sanic': {
+        'sanic >= 0.7.0',
+        'sanic-graphql',
+        'sanic-cors >= 0.9.4',
+        'graphene >= 2.0',
+        'graphql-ws >= 0.2.0',
+    },
+    'dev': [
+        'pytest',
+    ],
+}
+
 
 DEPENDENCY_LINKS = [
     'http://github.com/channelcat/sanic/tarball/30e6a310f132752669a74927530e8bc52a51e98e#egg=sanic-0.7.0',
@@ -40,23 +56,12 @@ setup(
     long_description=longdesc,
     install_requires=INSTALL_REQUIRES,
     dependency_links=DEPENDENCY_LINKS,
+    extras_require=EXTRAS_REQUIRE,
     # tests_require=tests_require,
     # test_suite='tests',
     classifiers=[
         'License :: OSI Approved :: BSD License',
 
-        # 'Development Status :: 1 - Planning',
-        # 'Development Status :: 2 - Pre-Alpha',
-        # 'Development Status :: 3 - Alpha',
-        # 'Development Status :: 4 - Beta',
-        # 'Development Status :: 5 - Production/Stable',
-        # 'Development Status :: 6 - Mature',
-        # 'Development Status :: 7 - Inactive',
-
-        # 'Programming Language :: Python :: 2',
-        # 'Programming Language :: Python :: 2.6',
-        # 'Programming Language :: Python :: 2.7',
-        # 'Programming Language :: Python :: 2 :: Only',
         # 'Programming Language :: Python :: 3',
         # 'Programming Language :: Python :: 3.0',
         # 'Programming Language :: Python :: 3.1',
@@ -64,7 +69,8 @@ setup(
         # 'Programming Language :: Python :: 3.3',
         # 'Programming Language :: Python :: 3.4',
         # 'Programming Language :: Python :: 3.5',
-        # 'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3 :: Only',
 
         # 'Programming Language :: Python :: Implementation :: CPython',
