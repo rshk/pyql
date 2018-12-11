@@ -3,6 +3,10 @@ PyQL
 
 GraphQL helpers for Python.
 
+- `Documentation <https://pyql-lib.readthedocs.io/en/latest/>`_
+- `PyPi package <https://pypi.org/project/PyQL/>`_
+- `GitHub repository <https://github.com/rshk/pyql>`_
+
 
 Schema definition
 =================
