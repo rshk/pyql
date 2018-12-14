@@ -1,7 +1,6 @@
 import inspect
 
 import graphql
-from graphql import GraphQLSchema
 
 
 class Schema:
@@ -15,26 +14,8 @@ class Schema:
         self.types = types
 
     def compile(self):
-        CACHE_KEY = '_compiled_schema'
-        compiled = getattr(self, CACHE_KEY, None)
-
-        if compiled is None:
-            compiled = self._compile()
-            setattr(self, CACHE_KEY, compiled)
-
-        return compiled
-
-    def _compile(self):
-        query = self._compile_query()
-        mutation = self._compile_mutation()
-        subscription = self._compile_subscription()
-
-        return GraphQLSchema(
-            query=query,
-            mutation=mutation,
-            subscription=subscription,
-            directives=self.directives,
-            types=self.types)
+        from pyql.schema.compile import compile_schema
+        return compile_schema(self)
 
     def set_query(self, query):
         self.query = query
@@ -44,24 +25,6 @@ class Schema:
 
     def set_subscription(self, subscription):
         self.subscription = subscription
-
-    def _compile_query(self):
-        from pyql.schema.compile import compile_object
-        if self.query is None:
-            return None
-        return compile_object(self.query)
-
-    def _compile_mutation(self):
-        from pyql.schema.compile import compile_object
-        if self.mutation is None:
-            return None
-        return compile_object(self.mutation)
-
-    def _compile_subscription(self):
-        from pyql.schema.compile import compile_object
-        if self.subscription is None:
-            return None
-        return compile_object(self.subscription)
 
     def execute(self, *args, **kwargs):
         compiled = self.compile()
@@ -129,7 +92,7 @@ class Object:
         return self.create_instance(**kwargs)
 
     def create_instance(self, **kwargs):
-        container = self._container_object
+        container = self.container_object
         return container(**kwargs)
 
     def _freeze(self):
@@ -142,12 +105,13 @@ class Object:
             raise RuntimeError('Cannot make changes to a frozen schema object')
 
     @property
-    def _container_object(self):
+    def container_object(self):
+        CACHE_KEY = '_cached_container_object'
         self._freeze()
-        container = getattr(self, '_cached_container_object', None)
+        container = getattr(self, CACHE_KEY, None)
         if container is None:
             container = self._make_container_object()
-            self._cached_container_object = container
+            setattr(self, CACHE_KEY, container)
         return container
 
     def _make_container_object(self):
@@ -187,7 +151,8 @@ class Interface:
 
     def __init__(self, name, fields=None, resolve_type=None, description=None):
         self.name = name
-        self.fields = fields
+        self.fields = {}
+        self._load_field_args(fields)
         self.resolve_type = resolve_type
         self.description = description
 
@@ -200,8 +165,6 @@ class Interface:
     def define_field(
             self, name, type, args=None, resolver=None,
             deprecation_reason=None, description=None):
-
-        self._assert_not_frozen()
 
         if resolver is None:
             resolver = make_default_resolver(name)
