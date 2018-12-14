@@ -24,9 +24,9 @@ arguments to the ``Schema`` constructor.
 Passing extra types
 ===================
 
-If you are using `interfaces <interfaces>`_, chances are you are not
-passing all your concrete types explicitly to the schema, so
-graphql-core has no way to resolve them.
+If you are using :doc:`interfaces <interfaces>`, chances are you're
+only using your interface type in the schema definition (so the
+concrete types are not reachable from the root object).
 
 If that's the case, you must pass them explicitly to the schema constructor:
 

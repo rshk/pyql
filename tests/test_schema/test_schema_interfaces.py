@@ -1,8 +1,4 @@
-import typing
-from datetime import datetime
-from enum import Enum
-
-from pyql import ID, NonNull, Object, Schema, Interface
+from pyql import ID, Interface, Object, Schema
 
 
 def test_interfaces():

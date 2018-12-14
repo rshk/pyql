@@ -133,3 +133,21 @@ This allows you to run queries like::
             }
         }
     }
+
+
+Container types
+===============
+
+Objects can be "instantiated" to create objects you can return from
+your resolvers:
+
+.. code-block:: python
+
+    MyObject = Object('MyObject', fields={'foo': str, 'bar': str})
+
+    @Query.field('example')
+    def resolve_example(root, info) -> MyObject:
+        return MyObject(foo='FOO', bar='BAR')
+
+This will also ensure types are understood correctly when using
+:doc:`interfaces <interfaces>`.
