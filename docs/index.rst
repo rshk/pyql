@@ -10,7 +10,7 @@ Welcome to PyQL's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   schema
+   schema/index
 
 
 

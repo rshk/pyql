@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'PyQL'
-copyright = '2018, Samuele Santi'
+copyright = '2018, Reinvent Software'
 author = 'Samuele Santi'
 
 # The short X.Y version
-version = ''
+version = '0.2'
 # The full version, including alpha/beta/rc tags
-release = '0.2'
+release = '0.2.1'
 
 
 # -- General configuration ---------------------------------------------------
