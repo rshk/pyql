@@ -2,7 +2,6 @@
 Schema definition
 #################
 
-
 One of the main goals of PyQL is providing a clean way of defining
 GraphQL schemas.
 
