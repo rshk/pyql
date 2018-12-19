@@ -33,6 +33,7 @@ EXTRAS_REQUIRE = {
     },
     'dev': [
         'pytest',
+        'pytest-cov',
         'sphinx',
     ],
 }
