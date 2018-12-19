@@ -1,8 +1,8 @@
 from enum import Enum
 
-from pyql import ID, NonNull, Object, Schema
-
 import pytest
+
+from pyql import Object, Schema
 
 
 @pytest.fixture
@@ -71,7 +71,9 @@ def test_enum_argument_must_be_value(sample_input_schema):
     result = sample_input_schema.execute("""
     { describeColor (color: RED) }
     """)
-    assert str(result.errors) == '[ValueError("\'RED\' is not a valid Color")]'
+    assert [str(x) for x in result.errors] == [
+        "'RED' is not a valid Color"
+    ]
     assert result.data is None
 
 
@@ -95,8 +97,9 @@ def test_enum_argument_variable_must_be_value(sample_input_schema):
         describeColor (color: $color)
     }
     """, variables={'color': 'GREEN'})
-    assert str(result.errors) == \
-        '[ValueError("\'GREEN\' is not a valid Color")]'
+    assert [str(x) for x in result.errors] == [
+        "'GREEN' is not a valid Color"
+    ]
     assert result.data is None
 
 
@@ -162,5 +165,7 @@ def test_numeric_enum_input_variable_type_mismatch(numeric_enum_schema):
     }
     """, variables={'num': '1'})
 
-    assert str(result.errors) == '[ValueError("\'1\' is not a valid Number")]'
+    assert [str(x) for x in result.errors] == [
+        "'1' is not a valid Number"
+    ]
     assert result.data is None

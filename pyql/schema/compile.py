@@ -1,5 +1,6 @@
 import datetime
 import functools
+import typing
 from enum import Enum
 from typing import Any, Callable
 
@@ -238,9 +239,23 @@ def get_graphql_type(pytype):
     except KeyError:
         pass
 
+    # ----------------------------------------------------------------
     # Lists, defined using ``typing.List[subtype]``
-    # TODO: is this the best way to do this comparison?
-    if getattr(pytype, '__origin__', None) is list:
+    #
+    # In Python 3.5 and 3.6, we could use issubclass(List[str], List).
+    # In Python 3.7 this will fail, as "Subscribed generics cannot be
+    # used with class and instance checks".
+    #
+    # As a fallback, we're checking the __origin__ attribute, but this
+    # feels quite sub-optimal.
+    #
+    # Also, on Python 3.5 / 3.6 ``List[str].__origin__ is List``,
+    # while on Python 3.7 ``List[str].__origin__ is list``.
+    #
+    # Search for a better alternative is under way.
+    # ----------------------------------------------------------------
+    pytype_origin = getattr(pytype, '__origin__', None)
+    if pytype_origin is list or pytype_origin is typing.List:
         arg, = pytype.__args__
         return GraphQLList(get_graphql_type(arg))
 
