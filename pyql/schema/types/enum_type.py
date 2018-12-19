@@ -31,7 +31,15 @@ class GraphQLEnumType(_GraphQLNamedType):
         return self._enum(name)
 
     def serialize(self, value):
-        # Serialize to client
+        """Serialize value to the client
+
+        Args:
+            value: one of the members of the Enum
+
+        Returns:
+            str or int: value of the enum member
+        """
+
         if not isinstance(value, self._enum):
             raise TypeError(
                 'Value must be an instance of Enum: {}'
@@ -39,13 +47,31 @@ class GraphQLEnumType(_GraphQLNamedType):
         return value.value
 
     def parse_value(self, value):
-        # Parse from query variable
+        """Parse value from variable
+
+        Args:
+            value: value, as passed in the GraphQL variable
+        """
+
         return self.get_value(value)
 
     def parse_literal(self, value_ast):
-        # Parse from query (inline literal)
-        if not isinstance(value_ast, ast.EnumValue):
-            # TODO: we can allow strings as well..?
-            raise TypeError('Expected EnumValue, got {}'
-                            .format(repr(value_ast)))
-        return self.get_value(value_ast.value)
+        """Parse value from query
+
+        Args:
+            value_ast: AST value
+        """
+
+        if isinstance(value_ast, ast.EnumValue):
+            return self.get_value(value_ast.value)
+
+        if isinstance(value_ast, ast.IntValue):
+            # We need this as there's no difference between an "enum
+            # value" integer and an actual literal integer.
+            # For strings we can be more strict, and won't accept
+            # "VALUE" (StringValue) in place of VALUE (EnumValue).
+            return self.get_value(int(value_ast.value))
+
+        raise TypeError(
+            'Invalid input value for Enum {}: {}'
+            .format(repr(self._enum), repr(value_ast)))

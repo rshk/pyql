@@ -98,3 +98,69 @@ def test_enum_argument_variable_must_be_value(sample_input_schema):
     assert str(result.errors) == \
         '[ValueError("\'GREEN\' is not a valid Color")]'
     assert result.data is None
+
+
+@pytest.fixture
+def numeric_enum_schema():
+
+    class Number(Enum):
+        ONE = 1
+        TWO = 2
+        THREE = 3
+
+    Query = Object('Query')
+
+    @Query.field('get_number')
+    def resolve_get_number(root, info) -> Number:
+        return Number.ONE
+
+    DESCRIPTIONS = {
+        Number.ONE: 'One',
+        Number.TWO: 'Two',
+        Number.THREE: 'Three',
+    }
+
+    @Query.field('get_number_name')
+    def resolve_get_number_name(root, info, num: Number) -> str:
+        return DESCRIPTIONS[num]
+
+    return Schema(query=Query)
+
+
+def test_numeric_enum_output(numeric_enum_schema):
+    result = numeric_enum_schema.execute('{getNumber}')
+
+    assert result.errors is None
+    assert result.data == {'getNumber': 1}
+
+
+def test_numeric_enum_input_inline(numeric_enum_schema):
+
+    result = numeric_enum_schema.execute('{getNumberName(num: 1)}')
+
+    assert result.errors is None
+    assert result.data == {'getNumberName': 'One'}
+
+
+def test_numeric_enum_input_variable(numeric_enum_schema):
+
+    result = numeric_enum_schema.execute("""
+    query getNumberName($num: Number!) {
+        getNumberName(num: $num)
+    }
+    """, variables={'num': 1})
+
+    assert result.errors is None
+    assert result.data == {'getNumberName': 'One'}
+
+
+def test_numeric_enum_input_variable_type_mismatch(numeric_enum_schema):
+
+    result = numeric_enum_schema.execute("""
+    query getNumberName($num: Number!) {
+        getNumberName(num: $num)
+    }
+    """, variables={'num': '1'})
+
+    assert str(result.errors) == '[ValueError("\'1\' is not a valid Number")]'
+    assert result.data is None

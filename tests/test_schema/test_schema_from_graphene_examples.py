@@ -50,16 +50,16 @@ def test_enum_output():
 
     result = schema.execute('{ randomCard { name, color } }')
     assert result.errors is None
-    assert result.data == {'randomCard': {'name': 'Hello', 'color': 'RED'}}
+    assert result.data == {'randomCard': {'name': 'Hello', 'color': 1}}
 
 
 def test_enum_argument():
     """Accept enum value as field argument"""
 
     class Episode(Enum):
-        NEWHOPE = 4
-        EMPIRE = 5
-        JEDI = 6
+        NEWHOPE = 'NEWHOPE'
+        EMPIRE = 'EMPIRE'
+        JEDI = 'JEDI'
 
     Query = Object('Query')
 
@@ -79,10 +79,8 @@ def test_enum_argument():
     assert result.data == {'episode': 'A new hope'}
 
     result = schema.execute('{ episode (episode: FOOBAR) }')
-    assert len(result.errors) == 1
-    assert result.errors[0].message == (
-        'Argument "episode" has invalid value FOOBAR.\n'
-        'Expected type "Episode", found FOOBAR.')
+    assert str(result.errors) == (
+        '[ValueError("\'FOOBAR\' is not a valid Episode")]')
     assert result.data is None
 
 
