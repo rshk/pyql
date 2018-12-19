@@ -21,11 +21,11 @@ attempt to use existing facilities in Python as much as possible
    enums
    lists
    interfaces
+   input-objects
    docs
 
 
 **TODO:**
 
 - unions
-- input objects
 - documentation

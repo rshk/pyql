@@ -19,8 +19,6 @@ def test_input_objects():
 
     @Mutation.field('create_post')
     def resolve_create_post(root, info, post: PostInput) -> Post:
-        # TODO: we want post to be a PostInput instance!!
-        # -> we need to wrap the resolver to replace argument, likely...
         return Post(
             id='1',
             title=post.title,
