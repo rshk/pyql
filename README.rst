@@ -8,6 +8,11 @@ GraphQL helpers for Python.
 - `GitHub repository <https://github.com/rshk/pyql>`_
 
 
+CI status: |ci-status|
+
+.. |ci-status| image:: https://circleci.com/gh/rshk/pyql.svg?style=svg
+    :target: https://circleci.com/gh/rshk/pyql
+
 Schema definition
 =================
 
