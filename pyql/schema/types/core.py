@@ -2,6 +2,8 @@ import inspect
 
 import graphql
 
+from pyql.utils.cache import cached_property
+
 
 class Schema:
     def __init__(self, *, query=None, mutation=None, subscription=None,
@@ -89,11 +91,7 @@ class Object:
         self.fields[name] = field
 
     def __call__(self, **kwargs):
-        return self.create_instance(**kwargs)
-
-    def create_instance(self, **kwargs):
-        container = self.container_object
-        return container(**kwargs)
+        return self.container_type(**kwargs)
 
     def _freeze(self):
         # After the "container" object is created and cached,
@@ -104,21 +102,43 @@ class Object:
         if self._frozen:
             raise RuntimeError('Cannot make changes to a frozen schema object')
 
+    @cached_property
+    def container_type(self):
+        self._freeze()
+        return make_container_type(self.name, {k: None for k in self.fields})
+
+    def __instancecheck__(self, instance):
+        # Allow instances of the container type to look like
+        # instances of the Object instance itself.
+        return isinstance(instance, self.container_type)
+
     @property
     def container_object(self):
-        CACHE_KEY = '_cached_container_object'
-        self._freeze()
-        container = getattr(self, CACHE_KEY, None)
-        if container is None:
-            container = self._make_container_object()
-            setattr(self, CACHE_KEY, container)
-        return container
+        # DEPRECATED!
+        return self.container_type
 
-    def _make_container_object(self):
-        return type(
-            self.name,
-            (ObjectContainer,),
-            {k: None for k in self.fields})
+    def __repr__(self):
+        # TODO: show more info about the object?
+        return '<pyql.Object {}>'.format(self.name)
+
+
+def make_container_type(type_name, fields):
+    """Make a "container type".
+
+    Args:
+        type_name:
+            name for the new type
+        fields:
+            name for the new fields
+        type_instance:
+            object instance the new type object instances will pretend
+            to be an instance of.
+    """
+
+    return type(
+        type_name,
+        (ObjectContainer,),
+        {key: val for key, val in fields.items()})
 
 
 def make_default_resolver(name, default=None):
@@ -140,8 +160,6 @@ def make_default_resolver(name, default=None):
 class ObjectContainer:
     """Base class for "data-structure" objects from GraphQL objects
     """
-
-    # TODO: make isinstance(<self>, <Object instance>) work!
 
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
@@ -193,14 +211,11 @@ class Field:
 
 class InputObject:
 
-    def __init__(
-            self, name, fields=None, description=None, container_type=None):
-
+    def __init__(self, name, fields=None, description=None):
         self.name = name
         self.fields = {}
         self._load_field_args(fields)
         self.description = description
-        self.container_type = container_type
 
     def _load_field_args(self, fields):
         if fields is None:
@@ -217,7 +232,16 @@ class InputObject:
             default_value=default_value,
             description=description,
             out_name=out_name)
-        self._fields[name] = field
+        self.fields[name] = field
+
+    @cached_property
+    def container_type(self):
+        return make_container_type(self.name, {k: None for k in self.fields})
+
+    def __instancecheck__(self, instance):
+        # Allow instances of the container type to look like
+        # instances of the InputObject instance itself.
+        return isinstance(instance, self.container_type)
 
 
 class InputField:

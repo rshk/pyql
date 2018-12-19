@@ -1,5 +1,5 @@
-Schema definition
-#################
+Schema object
+#############
 
 To define a schema, simply create an instance of ``pywl.Schema``:
 
@@ -45,22 +45,6 @@ If that's the case, you must pass them explicitly to the schema constructor:
    This is likely not going to be necessary in a future version, as
    we're planning to track concrete objects using a given interface,
    so we can resolve them automatically behind the scenes.
-
-
-Example schema definition
-=========================
-
-.. code-block:: python
-
-    from pyql import Object, Schema
-
-    Query = Object('Query')
-
-    @Query.field('hello')
-    def resolve_hello(root, info, argument: str = 'stranger') -> str:
-        return 'Hello ' + argument
-
-    schema = Schema(query=Query)
 
 
 Compilation

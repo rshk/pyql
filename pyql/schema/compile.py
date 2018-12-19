@@ -151,6 +151,12 @@ def compile_enum(enum: Enum) -> GraphQLEnumType:
 @cache_compiled_object
 def compile_input_object(obj: InputObject) -> GraphQLInputObjectType:
     assert isinstance(obj, InputObject)
+
+    # We need to wrap this as "container_type" will receive a dict as
+    # only argument, instead of keyword arguments.
+    def create_container(arg):
+        return obj.container_type(**arg)
+
     return GraphQLInputObjectType(
         name=obj.name,
         fields={
@@ -158,7 +164,7 @@ def compile_input_object(obj: InputObject) -> GraphQLInputObjectType:
             for name, field in obj.fields.items()
         },
         description=obj.description,
-        container_type=obj.container_type)
+        container_type=create_container)
 
 
 @cache_compiled_object
