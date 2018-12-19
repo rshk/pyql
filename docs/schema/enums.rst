@@ -43,11 +43,3 @@ They can be used as input types too:
         episode = Episode(episode)
 
         return DESCRIPTIONS.get(episode, 'Unknown episode')
-
-
-.. warning::
-
-    Currently, the enumerated field *value* will be passed to the
-    resolver, **not** the enum member as it would be expected
-    (i.e. ``episode`` in the above example is ``4``, not
-    ``Episode.NEWHOPE``).

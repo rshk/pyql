@@ -5,15 +5,15 @@ from typing import Any, Callable
 
 import graphql
 from graphql import (
-    GraphQLArgument, GraphQLBoolean, GraphQLEnumType, GraphQLEnumValue,
-    GraphQLField, GraphQLFloat, GraphQLID, GraphQLInputObjectField,
-    GraphQLInputObjectType, GraphQLInt, GraphQLInterfaceType, GraphQLList,
-    GraphQLNonNull, GraphQLObjectType, GraphQLSchema, GraphQLString,
-    GraphQLUnionType)
+    GraphQLArgument, GraphQLBoolean, GraphQLField, GraphQLFloat, GraphQLID,
+    GraphQLInputObjectField, GraphQLInputObjectType, GraphQLInt,
+    GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType,
+    GraphQLSchema, GraphQLString, GraphQLUnionType)
 
 from pyql.schema.types.core import (
     ID, Argument, Field, InputField, InputObject, Interface, List,
     NonNull, Object, Schema, Union)
+from pyql.schema.types.enum_type import GraphQLEnumType
 from pyql.schema.types.extra import GraphQLDate, GraphQLDateTime, GraphQLTime
 from pyql.utils.str_converters import to_camel_case
 
@@ -140,12 +140,7 @@ def compile_argument(arg: Argument) -> GraphQLArgument:
 @cache_compiled_object
 def compile_enum(enum: Enum) -> GraphQLEnumType:
     assert issubclass(enum, Enum)
-    return GraphQLEnumType(
-        name=enum.__name__,
-        values={
-            key: GraphQLEnumValue(name=key, value=val.value)
-            for key, val in enum.__members__.items()},
-        description=enum.__doc__)
+    return GraphQLEnumType(enum=enum)
 
 
 @cache_compiled_object
