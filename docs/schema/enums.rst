@@ -1,7 +1,9 @@
 Enums
 #####
 
-You can just use ``enum.Enum`` as normal:
+You can use Enums as input / output types as you would with any scalar type.
+
+Start by defining your Enum type:
 
 
 .. code-block:: python
@@ -9,37 +11,56 @@ You can just use ``enum.Enum`` as normal:
     from enum import Enum
 
     class Color(Enum):
-        RED = 1
-        GREEN = 2
-        BLUE = 3
+        RED = 'red'
+        GREEN = 'green'
+        BLUE = 'blue'
 
-    Query = Object('Query')
+
+Then, simply use it to annotate your resolvers:
+
+
+.. code-block:: python
 
     @Query.field('random_color')
     def resolve_random_color(root, info) -> Color:
         return Color.RED
 
 
-They can be used as input types too:
+Or for an input type:
 
 
 .. code-block:: python
 
-    class Episode(Enum):
-        NEWHOPE = 4
-        EMPIRE = 5
-        JEDI = 6
-
     DESCRIPTIONS = {
-        Episode.NEWHOPE: 'A new hope',
+        Color.RED: 'Cherry Red',
+        Color.GREEN: 'Grass Green',
+        Color.BLUE: 'Sky Blue',
     }
 
-    Query = Object('Query')
+    @Query.field('describe_color')
+    def resolve_episode(root, info, color: Color) -> str:
+        return DESCRIPTIONS[color]
 
-    @Query.field('episode')
-    def resolve_episode(root, info, episode: Episode) -> str:
 
-        # FIXME: this needs to happen in caller!
-        episode = Episode(episode)
+Values vs names
+===============
 
-        return DESCRIPTIONS.get(episode, 'Unknown episode')
+Keep in mind that enum *values* will be used externally; member names
+are for internal use only.
+
+So, for example, the first query will return:
+
+.. code-block:: json
+
+    { "randomColor": "red" }
+
+Likewise, the second and third query will accept ``red`` (the enum
+value) and not ``"RED"`` as input value.
+
+Valid query::
+
+    { describeColor(color: red) }
+
+Invalid query::
+
+    { describeColor(color: RED) }
