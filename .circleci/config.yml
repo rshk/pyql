@@ -5,7 +5,7 @@
 version: 2
 jobs:
 
-  test-python-3.7: &test-template
+  test-python-template: &test-template
 
     docker:
       # specify the version you desire here
@@ -51,20 +51,26 @@ jobs:
           path: test-reports
           destination: test-reports
 
-    test-python-3.6:
-      <<: *test-template
-      docker:
-        - image: circleci/python:3.6
+  test-python-3.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
 
-    test-python-3.5:
-      <<: *test-template
-      docker:
-        - image: circleci/python:3.5
+  test-python-3.6:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.6
+
+  test-python-3.5:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.5
+
 
 workflows:
   version: 2
   python_tests:
     jobs:
-      - test-python-3.7
-      - test-python-3.6
-      - test-python-3.5
+      - 'test-python-3.7'
+      - 'test-python-3.6'
+      - 'test-python-3.5'
