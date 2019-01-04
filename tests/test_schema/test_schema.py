@@ -147,3 +147,21 @@ def test_schema_with_nested_objects_list():
         {'title': 'Two', 'body': 'Second post'},
     ]}
     assert result.errors is None
+
+
+def test_basic_schema_with_default_query_object():
+
+    schema = Schema()
+
+    @schema.query.field('hello')
+    def resolve_hello(root, info) -> str:
+        return 'Hello world'
+
+    compiled = schema.compile()
+
+    # ----------------------------------------------------------------
+
+    result = graphql(compiled, '{hello}')
+
+    assert result.data == {'hello': 'Hello world'}
+    assert result.errors is None

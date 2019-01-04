@@ -9,9 +9,9 @@ class Schema:
     def __init__(self, *, query=None, mutation=None, subscription=None,
                  directives=None, types=None):
 
-        self.query = query
-        self.mutation = mutation
-        self.subscription = subscription
+        self.query = query or Object('Query')
+        self.mutation = mutation or Object('Mutation')
+        self.subscription = subscription or Object('Subscription')
         self.directives = directives
         self.types = types
 
@@ -89,6 +89,9 @@ class Object:
     def _define_field(self, name, field):
         self._assert_not_frozen()
         self.fields[name] = field
+
+    def has_fields(self):
+        return len(self.fields) > 0
 
     def __call__(self, **kwargs):
         return self.container_type(**kwargs)
