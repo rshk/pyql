@@ -23,15 +23,14 @@ Using PyQL:
 
 .. code-block:: python
 
-    from pyql import Object, Schema
+    from pyql import Schema
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('hello')
+    @schema.query.field('hello')
     def resolve_hello(root, info, name: str = 'world') -> str:
         return 'Hello {}'.format(name)
 
-    schema = Schema(query=Query)
     compiled = schema.compile()
 
 
