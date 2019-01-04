@@ -52,6 +52,11 @@ def compile_schema(schema: Schema) -> GraphQLSchema:
 def _compile_object_or_none(obj):
     if obj is None:
         return None
+
+    if not obj.has_fields():
+        # Skip root objects with no fields, or graphql-core will complain
+        return None
+
     return compile_object(obj)
 
 

@@ -16,6 +16,19 @@ Defining a basic schema
 
 .. code-block:: python
 
+    from pyql import Schema
+
+    schema = Schema()
+
+    @schema.query.field('hello')
+    def resolve_hello(root, info, argument: str = 'stranger') -> str:
+        return 'Hello ' + argument
+
+
+Or you can create your root Query object explicitly if you prefer doing so:
+
+.. code-block:: python
+
     from pyql import Object, Schema
 
     Query = Object('Query')
