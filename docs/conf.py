@@ -15,12 +15,13 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
+from datetime import datetime
 
 
 # -- Project information -----------------------------------------------------
 
 project = 'PyQL'
-copyright = '2018, Reinvent Software'
+copyright = str(datetime.now().year)
 author = 'Samuele Santi'
 
 # The short X.Y version
