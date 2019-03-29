@@ -123,13 +123,31 @@ def compile_interface(obj: Interface) -> GraphQLInterfaceType:
 def compile_field(field: Field) -> GraphQLField:
     assert isinstance(field, Field), \
         'Expected Field, got {}'.format(repr(field))
+
+    _args = field.args.items() if field.args else []
+
+    field_name_to_js = {
+        name: _name_to_graphql(name)
+        for name, _ in _args
+    }
+    field_name_from_js = {
+        val: key for key, val in field_name_to_js.items()
+    }
+
+    @functools.wraps(field.resolver)
+    def _wrapped_resolver(root, info, **js_kwargs):
+        kwargs = {}
+        for js_name, py_name in field_name_from_js.items():
+            kwargs[py_name] = js_kwargs[js_name]
+        return field.resolver(root, info, **kwargs)
+
     return GraphQLField(
         type=get_graphql_type(field.type),
         args={
-            _name_to_graphql(name): compile_argument(arg)
+            field_name_to_js[name]: compile_argument(arg)
             for name, arg in field.args.items()
         } if field.args else None,
-        resolver=field.resolver,
+        resolver=_wrapped_resolver,
         description=field.description,
         deprecation_reason=field.deprecation_reason)
 
