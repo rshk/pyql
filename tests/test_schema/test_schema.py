@@ -1,6 +1,7 @@
 from typing import List
 
-from graphql import GraphQLError, GraphQLObjectType, GraphQLSchema, graphql
+from graphql import GraphQLError, graphql
+
 from pyql import Object, Schema
 
 
