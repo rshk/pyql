@@ -138,7 +138,19 @@ def compile_field(field: Field) -> GraphQLField:
     def _wrapped_resolver(root, info, **js_kwargs):
         kwargs = {}
         for js_name, py_name in field_name_from_js.items():
-            kwargs[py_name] = js_kwargs[js_name]
+
+            # If an argument was omitted in the query (as opposed to
+            # setting its value to NULL), it will be missing from the
+            # keyword arguments passed to the resolver.
+
+            # We want to make sure we preserve that behaviour when
+            # converting names from camelCase to snake_case.
+
+            try:
+                kwargs[py_name] = js_kwargs[js_name]
+            except KeyError:
+                pass
+
         return field.resolver(root, info, **kwargs)
 
     return GraphQLField(
