@@ -28,7 +28,7 @@ jobs:
           name: install dependencies
           command: |
             pip install pipenv
-            pipenv install -e '.[dev]'
+            pipenv install -e '.[dev,flask]'
 
       - save_cache:
           paths:
