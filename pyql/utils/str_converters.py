@@ -7,7 +7,8 @@ def to_camel_case(snake_str):
     components = snake_str.split("_")
     # We capitalize the first letter of each component except the first one
     # with the 'capitalize' method and join them together.
-    return components[0] + "".join(x.capitalize() if x else "_" for x in components[1:])
+    return components[0] + "".join(
+        x.capitalize() if x else "_" for x in components[1:])
 
 
 # From this response in Stackoverflow
@@ -18,4 +19,4 @@ def to_snake_case(name):
 
 
 def to_const(string):
-    return re.sub("[\W|^]+", "_", string).upper()
+    return re.sub(r"[\W|^]+", "_", string).upper()
