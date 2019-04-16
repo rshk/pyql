@@ -31,6 +31,11 @@ EXTRAS_REQUIRE = {
         'graphene >= 2.0',
         'graphql-ws >= 0.2.0',
     },
+    'flask': {
+        'flask',
+        'flask-graphql',
+        'graphql-core',
+    },
     'dev': [
         'pytest',
         'pytest-cov',
