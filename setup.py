@@ -24,18 +24,6 @@ INSTALL_REQUIRES = [
 
 
 EXTRAS_REQUIRE = {
-    'sanic': {
-        'sanic >= 0.7.0',
-        'sanic-graphql',
-        'sanic-cors >= 0.9.4',
-        'graphene >= 2.0',
-        'graphql-ws >= 0.2.0',
-    },
-    'flask': {
-        'flask',
-        'flask-graphql',
-        'graphql-core',
-    },
     'dev': [
         'pytest',
         'pytest-cov',
@@ -44,11 +32,7 @@ EXTRAS_REQUIRE = {
 }
 
 
-DEPENDENCY_LINKS = [
-    'http://github.com/channelcat/sanic/tarball/30e6a310f132752669a74927530e8bc52a51e98e#egg=sanic-0.7.0',
-    'http://github.com/graphql-python/graphql-ws/tarball/660a0e0d6de66416e57179c2633795de5823d347#egg=graphql-ws-0.2.0',
-    'https://github.com/ashleysommer/sanic-cors/tarball/a17067967e0d447c870c48feca9cc53572316c3c#egg=sanic-cors-0.9.4',
-]
+DEPENDENCY_LINKS = []
 
 
 setup(
