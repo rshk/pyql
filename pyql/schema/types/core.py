@@ -1,6 +1,7 @@
 import inspect
 
 import graphql
+from graphql.utils.undefined import Undefined
 
 from pyql.utils.cache import cached_property
 
@@ -108,7 +109,8 @@ class Object:
     @cached_property
     def container_type(self):
         self._freeze()
-        return make_container_type(self.name, {k: None for k in self.fields})
+        # return make_container_type(self.name, {k: None for k in self.fields})
+        return make_container_type(self.name, {})
 
     def __instancecheck__(self, instance):
         # Allow instances of the container type to look like
@@ -150,12 +152,12 @@ def make_default_resolver(name, default=None):
 
         if root is None:
             if default is None:
-                return None
+                return Undefined
             return default()
 
         # TODO: use subscript if mapping?
 
-        return getattr(root, name)
+        return getattr(root, name, Undefined)
 
     return default_resolver
 
