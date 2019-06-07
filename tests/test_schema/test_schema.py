@@ -166,3 +166,29 @@ def test_basic_schema_with_default_query_object():
 
     assert result.data == {'hello': 'Hello world'}
     assert result.errors is None
+
+
+def test_return_partial_object():
+
+    import logging
+    logging.getLogger().debug('LOGGING IS ON')
+
+    schema = Schema()
+
+    MyObj = Object('MyObj', fields={
+        'foo': str,
+        'bar': str,
+    })
+
+    @schema.query.field('my_obj')
+    def resolve_my_obj(root, info) -> MyObj:
+        return MyObj(foo='FOO')
+
+    compiled = schema.compile()
+
+    # ----------------------------------------------------------------
+
+    result = graphql(compiled, '{ myObj { foo, bar } }')
+
+    assert result.errors is None
+    assert result.data == {'myObj': {'foo': 'FOO'}}
