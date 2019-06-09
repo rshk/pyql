@@ -1,6 +1,7 @@
 from enum import Enum
 
 from graphql import GraphQLEnumType as _GraphQLNamedType
+from graphql import GraphQLEnumValue
 from graphql.language import ast
 
 
@@ -23,6 +24,16 @@ class GraphQLEnumType(_GraphQLNamedType):
     @property
     def description(self):
         return self._enum.__doc__
+
+    @property
+    def values(self):
+        # Needed for introspection
+        # NOTE: the actual value used in queries is ``name``; keys are
+        # for internal use only.
+        return [
+            GraphQLEnumValue(value.value, name=value.value)
+            for key, value in self.get_values().items()
+        ]
 
     def get_values(self):
         return self._enum.__members__

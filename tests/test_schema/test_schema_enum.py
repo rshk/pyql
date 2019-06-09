@@ -169,3 +169,30 @@ def test_numeric_enum_input_variable_type_mismatch(numeric_enum_schema):
         "'1' is not a valid Number"
     ]
     assert result.data is None
+
+
+def test_instrospect_enum(sample_output_schema):
+
+    result = sample_output_schema.execute("""
+    query IntrospectionQuery {
+      __type(name: "Color") {
+        name
+        kind
+        enumValues(includeDeprecated: true) {
+            name
+        }
+      }
+    }
+    """)
+    assert result.errors is None
+    assert result.data == {
+        '__type': {
+            'name': 'Color',
+            'kind': 'ENUM',
+            'enumValues': [
+                {'name': 'red'},
+                {'name': 'green'},
+                {'name': 'blue'},
+            ]
+        }
+    }
