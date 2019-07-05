@@ -124,20 +124,26 @@ def compile_field(field: Field) -> GraphQLField:
     assert isinstance(field, Field), \
         'Expected Field, got {}'.format(repr(field))
 
-    _args = field.args.items() if field.args else []
+    _arg_names = field.args.keys() if field.args else []
 
-    field_name_to_js = {
-        name: _name_to_graphql(name)
-        for name, _ in _args
+    # NOTE: While we could just convert names back using
+    # to_snake_case(), doing so would mean assuming names in Python
+    # are in snake_case, which might not always be the case.
+
+    ARG_NAMES_PYTHON_TO_GQL = {
+        py_name: _name_to_graphql(py_name)
+        for py_name in _arg_names
     }
-    field_name_from_js = {
-        val: key for key, val in field_name_to_js.items()
+
+    ARG_NAMES_GQL_TO_PYTHON = {
+        gql_name: py_name
+        for py_name, gql_name in ARG_NAMES_PYTHON_TO_GQL.items()
     }
 
     @functools.wraps(field.resolver)
     def _wrapped_resolver(root, info, **js_kwargs):
         kwargs = {}
-        for js_name, py_name in field_name_from_js.items():
+        for js_name, py_name in ARG_NAMES_GQL_TO_PYTHON.items():
 
             # If an argument was omitted in the query (as opposed to
             # setting its value to NULL), it will be missing from the
@@ -156,7 +162,7 @@ def compile_field(field: Field) -> GraphQLField:
     return GraphQLField(
         type=get_graphql_type(field.type),
         args={
-            field_name_to_js[name]: compile_argument(arg)
+            ARG_NAMES_PYTHON_TO_GQL[name]: compile_argument(arg)
             for name, arg in field.args.items()
         } if field.args else None,
         resolver=_wrapped_resolver,
@@ -183,15 +189,36 @@ def compile_enum(enum: Enum) -> GraphQLEnumType:
 def compile_input_object(obj: InputObject) -> GraphQLInputObjectType:
     assert isinstance(obj, InputObject)
 
-    # We need to wrap this as "container_type" will receive a dict as
-    # only argument, instead of keyword arguments.
+    # Create map between fields used internally and by the client.
+    # Convert all names to camelCase, as that's the convention
+    # normally used with GraphQL / Javascript.
+
+    # NOTE: see note about name conversion in compile_field()
+
+    FIELD_NAMES_PYTHON_TO_GQL = {
+        py_name: _name_to_graphql(py_name)
+        for py_name in obj.fields.keys()
+    }
+
+    FIELD_NAMES_GQL_TO_PYTHON = {
+        gql_name: py_name
+        for py_name, gql_name in FIELD_NAMES_PYTHON_TO_GQL.items()
+    }
+
+    # Create an instance of the object that will be passed as argument
+    # to the resolver.
+    # We need to convert names to their original form (usually
+    # snake_case).
     def create_container(arg):
-        return obj.container_type(**arg)
+        return obj.container_type(**{
+            FIELD_NAMES_GQL_TO_PYTHON[name]: value
+            for name, value in arg.items()
+        })
 
     return GraphQLInputObjectType(
         name=obj.name,
         fields={
-            _name_to_graphql(name): compile_input_field(field)
+            FIELD_NAMES_PYTHON_TO_GQL[name]: compile_input_field(field)
             for name, field in obj.fields.items()
         },
         description=obj.description,
