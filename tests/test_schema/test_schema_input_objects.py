@@ -44,3 +44,28 @@ def test_input_objects():
             'body': 'Hello world',
         }
     }
+
+
+def test_input_objects_field_names_are_converted():
+
+    MyInput = InputObject('MyInput', fields={
+        'some_field_name': str,
+    })
+
+    # Need at least one query, for some reason...
+    schema = Schema(query=Object('Query', {'q': str}))
+
+    @schema.mutation.field('do_something')
+    def resolve_do_something(root, info, obj: MyInput) -> str:
+        return obj.some_field_name
+
+    result = schema.execute("""
+    mutation doSomething($obj: MyInput!) {
+        doSomething(obj: $obj)
+    }
+    """, variables={'obj': {'someFieldName': 'HELLO'}})
+
+    assert result.errors is None
+    assert result.data == {
+        'doSomething': 'HELLO'
+    }
