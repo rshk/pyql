@@ -23,12 +23,31 @@ def compile_schema(schema: Schema) -> GraphQLSchema:
     return GraphQLCompiler().compile_schema(schema)
 
 
+DEFAULT_TYPE_MAP = {
+    str: GraphQLString,
+    int: GraphQLInt,
+    float: GraphQLFloat,
+    bool: GraphQLBoolean,
+    ID: GraphQLID,
+
+    datetime.datetime: GraphQLDateTime,
+    datetime.date: GraphQLDate,
+    datetime.time: GraphQLTime,
+
+    # TODO: support JSONString too? (Like Graphene does)
+    # TODO: Provide an API to extend this mapping (?)
+}
+
+
 class GraphQLCompiler:
 
     # We need to use a class here to keep local state (objects cache)
 
-    def __init__(self):
+    def __init__(self, custom_types=None):
         self._cache = {}
+        self._type_map = dict(DEFAULT_TYPE_MAP)
+        if custom_types:
+            self._type_map.update(custom_types)
 
     def get_from_cache(self, obj):
         return self._cache.get(obj)
@@ -85,7 +104,7 @@ class GraphQLCompiler:
             def is_type_of(val, info):
                 return isinstance(val, obj.container_object)
 
-        objtype = GraphQLObjectType(
+        compiled_type = GraphQLObjectType(
 
             # Object names are in CamelCase both in Python and GraphQL,
             # so no need for conversion here.
@@ -94,46 +113,51 @@ class GraphQLCompiler:
             is_type_of=is_type_of,
             description=obj.description,
 
-            # Placeholder values
-            fields={},
-            interfaces=[],
+            fields={},  # placeholder
+            interfaces=[],  # placeholder
         )
 
         # Need to stick it into cache before we start compiling fields.
         # This way, we already have a reference to this object and avoid
         # infinite recursion if there is a circular reference.
-        self.add_to_cache(obj, objtype)
+        self.add_to_cache(obj, compiled_type)
 
-        objtype.fields = {
+        compiled_type.fields = {
             _name_to_graphql(name): self.compile_field(field)
             for name, field in obj.fields.items()
         }
 
-        objtype.interfaces = [
+        compiled_type.interfaces = [
             self.compile_interface(x) for x in obj.interfaces
         ] if obj.interfaces else []
 
-        return objtype
+        return compiled_type
 
     @cache_compiled_object
     def compile_interface(self, obj: Interface) -> GraphQLInterfaceType:
         assert isinstance(obj, Interface)
-        return GraphQLInterfaceType(
+        compiled_type = GraphQLInterfaceType(
 
             # Object names are in CamelCase both in Python and GraphQL,
             # so no need for conversion here.
             name=obj.name,
 
-            fields={
-                _name_to_graphql(name): self.compile_field(field)
-                for name, field in obj.fields.items()
-            },
+            fields={},  # placeholder
 
             # TODO: do we need to wrap this, so we can convert types
             #       on the fly?
             resolve_type=obj.resolve_type,
 
             description=obj.description)
+
+        self.add_to_cache(obj, compiled_type)
+
+        compiled_type.fields = {
+            _name_to_graphql(name): self.compile_field(field)
+            for name, field in obj.fields.items()
+        }
+
+        return compiled_type
 
     @cache_compiled_object
     def compile_field(self, field: Field) -> GraphQLField:
@@ -175,15 +199,21 @@ class GraphQLCompiler:
 
             return field.resolver(root, info, **kwargs)
 
-        return GraphQLField(
+        compiled_type = GraphQLField(
             type=self.get_graphql_type(field.type),
-            args={
-                ARG_NAMES_PYTHON_TO_GQL[name]: self.compile_argument(arg)
-                for name, arg in field.args.items()
-            } if field.args else None,
+            args={},  # placeholder
             resolver=_wrapped_resolver,
             description=field.description,
             deprecation_reason=field.deprecation_reason)
+
+        self.add_to_cache(field, compiled_type)
+
+        compiled_type.args = {
+            ARG_NAMES_PYTHON_TO_GQL[name]: self.compile_argument(arg)
+            for name, arg in field.args.items()
+        } if field.args else {}
+
+        return compiled_type
 
     @cache_compiled_object
     def compile_argument(self, arg: Argument) -> GraphQLArgument:
@@ -228,15 +258,21 @@ class GraphQLCompiler:
                 for name, value in arg.items()
             })
 
-        return GraphQLInputObjectType(
+        compiled_type = GraphQLInputObjectType(
             name=obj.name,
-            fields={
-                FIELD_NAMES_PYTHON_TO_GQL[name]:
-                self.compile_input_field(field)
-                for name, field in obj.fields.items()
-            },
+            fields={},  # placeholder
             description=obj.description,
             container_type=create_container)
+
+        self.add_to_cache(obj, compiled_type)
+
+        compiled_type.fields = {
+            FIELD_NAMES_PYTHON_TO_GQL[name]:
+            self.compile_input_field(field)
+            for name, field in obj.fields.items()
+        }
+
+        return compiled_type
 
     @cache_compiled_object
     def compile_input_field(
@@ -258,21 +294,6 @@ class GraphQLCompiler:
                 self.get_graphql_type(t) for t in union.types),
             resolve_type=union.resolve_type,
             description=union.description)
-
-    TYPE_MAP = {
-        str: GraphQLString,
-        int: GraphQLInt,
-        float: GraphQLFloat,
-        bool: GraphQLBoolean,
-        ID: GraphQLID,
-
-        datetime.datetime: GraphQLDateTime,
-        datetime.date: GraphQLDate,
-        datetime.time: GraphQLTime,
-
-        # TODO: support JSONString too? (Like Graphene does)
-        # TODO: Provide an API to extend this mapping (?)
-    }
 
     def get_graphql_type(self, pytype):
         """Resolve a Python type to equivalent GraphQL type
@@ -303,7 +324,7 @@ class GraphQLCompiler:
 
         # Simple scalar types
         try:
-            return self.TYPE_MAP[pytype]
+            return self._type_map[pytype]
         except KeyError:
             pass
 
