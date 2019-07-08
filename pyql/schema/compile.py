@@ -19,10 +19,15 @@ from pyql.schema.types.extra import GraphQLDate, GraphQLDateTime, GraphQLTime
 from pyql.utils.str_converters import to_camel_case
 
 
+# FIXME: keeping this global is not the best thing.. should we use a
+# temporary class instance instead?
+COMPILED_OBJECTS_CACHE = {}
+
+
 def cache_compiled_object(fn: Callable) -> Any:
     """Decorator to cache compiled object result"""
 
-    COMPILED_OBJECTS_CACHE = {}
+    # COMPILED_OBJECTS_CACHE = {}
 
     @functools.wraps(fn)
     def wrapped(obj):
@@ -33,6 +38,10 @@ def cache_compiled_object(fn: Callable) -> Any:
         return result
 
     return wrapped
+
+
+def add_compiled_object_to_cache(obj, result):
+    COMPILED_OBJECTS_CACHE[obj] = result
 
 
 def _name_to_graphql(name):
@@ -80,23 +89,35 @@ def compile_object(obj: Object) -> GraphQLObjectType:
         def is_type_of(val, info):
             return isinstance(val, obj.container_object)
 
-    return GraphQLObjectType(
+    objtype = GraphQLObjectType(
 
         # Object names are in CamelCase both in Python and GraphQL,
         # so no need for conversion here.
         name=obj.name,
 
-        fields={
-            _name_to_graphql(name): compile_field(field)
-            for name, field in obj.fields.items()
-        },
-
-        interfaces=[
-            compile_interface(x) for x in obj.interfaces
-        ] if obj.interfaces else None,
-
         is_type_of=is_type_of,
-        description=obj.description)
+        description=obj.description,
+
+        # Placeholder values
+        fields={},
+        interfaces=[],
+    )
+
+    # Need to stick it into cache before we start compiling fields.
+    # This way, we already have a reference to this object and avoid
+    # infinite recursion if there is a circular reference.
+    add_compiled_object_to_cache(obj, objtype)
+
+    objtype.fields = {
+        _name_to_graphql(name): compile_field(field)
+        for name, field in obj.fields.items()
+    }
+
+    objtype.interfaces = [
+        compile_interface(x) for x in obj.interfaces
+    ] if obj.interfaces else []
+
+    return objtype
 
 
 @cache_compiled_object
