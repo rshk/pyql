@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '0.4.0'
+version = '1.0.0'
 
 here = os.path.dirname(__file__)
 
@@ -16,7 +16,7 @@ if os.path.exists('CHANGELOG.rst'):
 INSTALL_REQUIRES = [
 
     # GraphQL schema definition
-    'graphql-core',
+    'graphql-core <3',
 
     # ISO8601 date parsing
     'aniso8601',
