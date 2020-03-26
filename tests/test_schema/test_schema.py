@@ -51,7 +51,7 @@ def test_simple_query_with_optional_argument():
     query hello($name: String!) {
         hello(name: $name)
     }
-    """, variables={'name': 'WROLD!!1'})
+    """, variable_values={'name': 'WROLD!!1'})
 
     assert result.data == {'hello': 'Hello WROLD!!1'}
     assert result.errors is None
@@ -86,7 +86,7 @@ def test_simple_query_with_mandatory_argument():
     query hello($name: String!) {
         hello(name: $name)
     }
-    """, variables={'name': 'WROLD!!1'})
+    """, variable_values={'name': 'WROLD!!1'})
 
     assert result.data == {'hello': 'Hello WROLD!!1'}
     assert result.errors is None

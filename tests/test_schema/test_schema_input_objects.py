@@ -36,7 +36,7 @@ def test_input_objects():
         id, title, body
       }
     }
-    """, variables={'post': {'title': 'Hello', 'body': 'Hello world'}})
+    """, variable_values={'post': {'title': 'Hello', 'body': 'Hello world'}})
 
     assert result.errors is None
     assert result.data == {
@@ -67,7 +67,7 @@ def test_input_objects_field_names_are_converted():
     mutation doSomething($obj: MyInput!) {
         doSomething(obj: $obj)
     }
-    """, variables={'obj': {'someFieldName': 'HELLO'}})
+    """, variable_values={'obj': {'someFieldName': 'HELLO'}})
 
     assert result.errors is None
     assert result.data == {
@@ -94,7 +94,7 @@ def test_field_names_can_be_camelcase_in_python():
     mutation doSomething($obj: MyInput!) {
         doSomething(obj: $obj)
     }
-    """, variables={'obj': {'someFieldName': 'HELLO'}})
+    """, variable_values={'obj': {'someFieldName': 'HELLO'}})
 
     assert result.errors is None
     assert result.data == {

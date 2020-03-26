@@ -49,7 +49,7 @@ def test_interfaces():
         }
       }
     }
-    """, variables={'ep': 'JEDI'})
+    """, variable_values={'ep': 'JEDI'})
 
     assert result.errors is None
     assert result.data == {
