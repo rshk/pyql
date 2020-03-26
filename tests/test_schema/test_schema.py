@@ -168,10 +168,7 @@ def test_basic_schema_with_default_query_object():
     assert result.errors is None
 
 
-def test_return_partial_object():
-
-    import logging
-    logging.getLogger().debug('LOGGING IS ON')
+def test_omitted_fields_are_filled_with_none():
 
     schema = Schema()
 
@@ -191,4 +188,4 @@ def test_return_partial_object():
     result = graphql(compiled, '{ myObj { foo, bar } }')
 
     assert result.errors is None
-    assert result.data == {'myObj': {'foo': 'FOO'}}
+    assert result.data == {'myObj': {'foo': 'FOO', 'bar': None}}

@@ -1,7 +1,6 @@
 import inspect
 
 import graphql
-from graphql.utils.undefined import Undefined
 
 from pyql.utils.cache import cached_property
 
@@ -152,12 +151,12 @@ def make_default_resolver(name, default=None):
 
         if root is None:
             if default is None:
-                return Undefined
+                return None
             return default()
 
         # TODO: use subscript if mapping?
 
-        return getattr(root, name, Undefined)
+        return getattr(root, name, None)
 
     return default_resolver
 
