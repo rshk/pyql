@@ -84,7 +84,7 @@ def test_enum_argument_variable(sample_input_schema):
     query describeColor($color: Color!) {
         describeColor (color: $color)
     }
-    """, variables={'color': 'green'})
+    """, variable_values={'color': 'green'})
     assert result.errors is None
     assert result.data == {'describeColor': 'Grass Green'}
 
@@ -96,7 +96,7 @@ def test_enum_argument_variable_must_be_value(sample_input_schema):
     query describeColor($color: Color!) {
         describeColor (color: $color)
     }
-    """, variables={'color': 'GREEN'})
+    """, variable_values={'color': 'GREEN'})
     assert [str(x) for x in result.errors] == [
         "'GREEN' is not a valid Color"
     ]
@@ -151,7 +151,7 @@ def test_numeric_enum_input_variable(numeric_enum_schema):
     query getNumberName($num: Number!) {
         getNumberName(num: $num)
     }
-    """, variables={'num': 1})
+    """, variable_values={'num': 1})
 
     assert result.errors is None
     assert result.data == {'getNumberName': 'One'}
@@ -163,7 +163,7 @@ def test_numeric_enum_input_variable_type_mismatch(numeric_enum_schema):
     query getNumberName($num: Number!) {
         getNumberName(num: $num)
     }
-    """, variables={'num': '1'})
+    """, variable_values={'num': '1'})
 
     assert [str(x) for x in result.errors] == [
         "'1' is not a valid Number"

@@ -23,7 +23,7 @@ def test_arguments_are_converted_to_snake_case():
             hello(someArgName: $arg)
         }
         """,
-        variables={'arg': 'IT WORKS'})
+        variable_values={'arg': 'IT WORKS'})
 
     assert result.errors is None
     assert result.data == {'hello': 'IT WORKS'}

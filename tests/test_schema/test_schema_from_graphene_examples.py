@@ -380,7 +380,7 @@ def test_mutation_with_variables():
     mutation letterCount($text: String!) {
         result: letterCount(text: $text)
     }
-    """, variables={'text': 'HELLO'})
+    """, variable_values={'text': 'HELLO'})
 
     assert result.errors is None
     assert result.data == {'result': 5}
