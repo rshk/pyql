@@ -1,4 +1,6 @@
 import inspect
+import warnings
+from collections.abc import Mapping
 
 import graphql
 
@@ -118,7 +120,9 @@ class Object:
 
     @property
     def container_object(self):
-        # DEPRECATED!
+        warnings.warn(DeprecationWarning(
+            'Object.container_object has been renamed to '
+            'Object.container_type'))
         return self.container_type
 
     def __repr__(self):
@@ -145,18 +149,25 @@ def make_container_type(type_name, fields):
         {key: val for key, val in fields.items()})
 
 
-def make_default_resolver(name, default=None):
+def make_default_resolver(name):
 
     def default_resolver(root, info):
 
         if root is None:
-            if default is None:
+            return None
+
+        if isinstance(root, Mapping):
+            try:
+                return root[name]
+            except KeyError:
                 return None
-            return default()
 
-        # TODO: use subscript if mapping?
+        try:
+            return getattr(root, name)
+        except AttributeError:
+            pass
 
-        return getattr(root, name, None)
+        return None
 
     return default_resolver
 
