@@ -12,8 +12,8 @@ from graphql import (
     GraphQLSchema, GraphQLString, GraphQLUnionType)
 
 from pyql.schema.types.core import (
-    ID, Argument, Field, InputField, InputObject, Interface, List,
-    NonNull, Object, Schema, Union)
+    ID, Argument, Field, InputField, InputObject, Interface, List, NonNull,
+    Object, ObjectContainer, Schema, Union)
 from pyql.schema.types.enum_type import GraphQLEnumType
 from pyql.schema.types.extra import GraphQLDate, GraphQLDateTime, GraphQLTime
 from pyql.utils.str_converters import to_camel_case
@@ -97,12 +97,15 @@ class GraphQLCompiler:
 
         is_type_of = obj.is_type_of
         if is_type_of is None:
-            # Checks whether an object returned from a resolver belongs to
-            # this object type.
-            # We allow users to override this, but the default
-            # implementation should work fine in most cases, really..
+
             def is_type_of(val, info):
-                return isinstance(val, obj.container_object)
+                # If it's an instance of a container type, it must be
+                # the correct one.
+                if isinstance(val, ObjectContainer):
+                    return isinstance(val, obj.container_type)
+
+                # Accept any other object
+                return True
 
         compiled_type = GraphQLObjectType(
 
