@@ -203,7 +203,7 @@ class GraphQLCompiler:
             return field.resolver(root, info, **kwargs)
 
         compiled_type = GraphQLField(
-            type=self.get_graphql_type(field.type),
+            type_=self.get_graphql_type(field.type),
             args={},  # placeholder
             resolver=_wrapped_resolver,
             description=field.description,
@@ -222,7 +222,7 @@ class GraphQLCompiler:
     def compile_argument(self, arg: Argument) -> GraphQLArgument:
         assert isinstance(arg, Argument)
         return GraphQLArgument(
-            type=self.get_graphql_type(arg.type),
+            type_=self.get_graphql_type(arg.type),
             default_value=arg.default_value,
             description=arg.description)
 
@@ -283,7 +283,7 @@ class GraphQLCompiler:
 
         assert isinstance(field, InputField)
         return GraphQLInputObjectField(
-            type=self.get_graphql_type(field.type),
+            type_=self.get_graphql_type(field.type),
             default_value=field.default_value,
             description=field.description,
             out_name=field.out_name)
