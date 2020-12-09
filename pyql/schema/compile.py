@@ -7,7 +7,7 @@ from typing import Any, Callable
 import graphql
 from graphql import (
     GraphQLArgument, GraphQLBoolean, GraphQLField, GraphQLFloat, GraphQLID,
-    GraphQLInputObjectField, GraphQLInputObjectType, GraphQLInt,
+    GraphQLInputField, GraphQLInputObjectType, GraphQLInt,
     GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType,
     GraphQLSchema, GraphQLString, GraphQLUnionType)
 
@@ -278,9 +278,7 @@ class GraphQLCompiler:
         return compiled_type
 
     @cache_compiled_object
-    def compile_input_field(
-            self, field: InputField) -> GraphQLInputObjectField:
-
+    def compile_input_field(self, field: InputField) -> GraphQLInputField:
         assert isinstance(field, InputField)
         return GraphQLInputObjectField(
             type_=self.get_graphql_type(field.type),
