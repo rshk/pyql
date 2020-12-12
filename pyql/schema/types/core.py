@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import warnings
 from collections.abc import Mapping
@@ -30,9 +31,40 @@ class Schema:
     def set_subscription(self, subscription):
         self.subscription = subscription
 
-    def execute(self, *args, **kwargs):
+    def execute(self, *args, sync=True, **kwargs):
+        """Execute a GraphQL operation on this schema
+
+        Args:
+            sync:
+                If True (the default), run the query syncronously and
+                return the result. Return a coroutine otherwise.
+            variables:
+                (deprecated) variables to be passed to the query
+            variable_values:
+                Variables to be passed to the query (replaces
+                "variables")
+            *args:
+                Extra arguments passed to graphql.graphql()
+            **kwawrgs:
+                Extra arguments passed to graphql.graphql()
+        """
+
+        if 'variables' in kwargs:
+            # TODO: issue a deprecation warning?
+            kwargs['variable_values'] = kwargs.pop('variables')
+
         compiled = self.compile()
-        return graphql.graphql(compiled, *args, **kwargs)
+        coro = graphql.graphql(compiled, *args, **kwargs)
+
+        if sync:
+
+            # In Python 3.7+ we could do:
+            # return asyncio.run(coro)
+
+            loop = asyncio.get_event_loop()
+            return loop.run_until_complete(coro)
+
+        return coro
 
 
 class Object:
