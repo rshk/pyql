@@ -205,7 +205,7 @@ class GraphQLCompiler:
         compiled_type = GraphQLField(
             type_=self.get_graphql_type(field.type),
             args={},  # placeholder
-            resolver=_wrapped_resolver,
+            resolve=_wrapped_resolver,
             description=field.description,
             deprecation_reason=field.deprecation_reason)
 
