@@ -68,8 +68,11 @@ def test_enum_argument():
     assert result.data == {'episode': 'A new hope'}
 
     result = schema.execute('{ episode (episode: FOOBAR) }')
-    assert [str(x) for x in result.errors] == [
-        "'FOOBAR' is not a valid Episode"
+
+    assert result.errors is not None
+    assert [x.message for x in result.errors] == [
+        "Expected value of type 'Episode!', found FOOBAR; "
+        "'FOOBAR' is not a valid Episode",
     ]
     assert result.data is None
 

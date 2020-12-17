@@ -61,9 +61,13 @@ def test_enum_argument_must_be_value(sample_input_schema):
     result = sample_input_schema.execute("""
     { describeColor (color: RED) }
     """)
-    assert [str(x) for x in result.errors] == [
+    assert result.errors is not None
+    assert len(result.errors) == 1
+    assert result.errors[0].message == (
+        "Expected value of type 'Color!', found RED; "
         "'RED' is not a valid Color"
-    ]
+    )
+
     assert result.data is None
 
 
@@ -75,6 +79,7 @@ def test_enum_argument_variable(sample_input_schema):
         describeColor (color: $color)
     }
     """, variable_values={'color': 'green'})
+
     assert result.errors is None
     assert result.data == {'describeColor': 'Grass Green'}
 
@@ -87,9 +92,13 @@ def test_enum_argument_variable_must_be_value(sample_input_schema):
         describeColor (color: $color)
     }
     """, variable_values={'color': 'GREEN'})
-    assert [str(x) for x in result.errors] == [
-        "'GREEN' is not a valid Color"
-    ]
+
+    assert result.errors is not None
+    assert len(result.errors) == 1
+    assert result.errors[0].message == (
+        "Variable '$color' got invalid value 'GREEN'; "
+        "Expected type 'Color'. 'GREEN' is not a valid Color"
+    )
     assert result.data is None
 
 
@@ -155,8 +164,10 @@ def test_numeric_enum_input_variable_type_mismatch(numeric_enum_schema):
     }
     """, variable_values={'num': '1'})
 
-    assert [str(x) for x in result.errors] == [
-        "'1' is not a valid Number"
+    assert result.errors is not None
+    assert [x.message for x in result.errors] == [
+        "Variable '$num' got invalid value '1'; "
+        "Expected type 'Number'. '1' is not a valid Number"
     ]
     assert result.data is None
 
