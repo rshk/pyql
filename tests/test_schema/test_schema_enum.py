@@ -8,29 +8,19 @@ from pyql import Object, Schema
 @pytest.fixture
 def sample_output_schema():
 
-    class Color(Enum):
-        RED = 'red'
-        GREEN = 'green'
-        BLUE = 'blue'
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('random_color')
+    @schema.query.field('random_color')
     def resolve_random_color(root, info) -> Color:
         return Color.RED
 
-    return Schema(query=Query)
+    return schema
 
 
 @pytest.fixture
 def sample_input_schema():
 
-    class Color(Enum):
-        RED = 'red'
-        GREEN = 'green'
-        BLUE = 'blue'
-
-    Query = Object('Query')
+    schema = Schema()
 
     DESCRIPTIONS = {
         Color.RED: 'Cherry Red',
@@ -38,12 +28,12 @@ def sample_input_schema():
         Color.BLUE: 'Sky Blue',
     }
 
-    @Query.field('describe_color')
+    @schema.query.field('describe_color')
     def resolve_describe_color(root, info, color: Color) -> str:
         assert isinstance(color, Color)
         return DESCRIPTIONS[color]
 
-    return Schema(query=Query)
+    return schema
 
 
 def test_enum_output(sample_output_schema):

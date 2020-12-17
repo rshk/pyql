@@ -10,13 +10,11 @@ from pyql import ID, NonNull, Object, Schema
 
 
 def test_basic_schema():
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('hello')
+    @schema.query.field('hello')
     def resolve_hello(root, info, argument: str = 'stranger') -> str:
         return 'Hello ' + argument
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{ hello }')
     assert result.data == {'hello': 'Hello stranger'}
@@ -40,13 +38,11 @@ def test_enum_output():
         'color': Color,
     })
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('random_card')
+    @schema.query.field('random_card')
     def resolve_random_card(root, info) -> Card:
         return Card(name='Hello', color=Color.RED)
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{ randomCard { name, color } }')
     assert result.errors is None
@@ -56,14 +52,9 @@ def test_enum_output():
 def test_enum_argument():
     """Accept enum value as field argument"""
 
-    class Episode(Enum):
-        NEWHOPE = 'NEWHOPE'
-        EMPIRE = 'EMPIRE'
-        JEDI = 'JEDI'
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('episode')
+    @schema.query.field('episode')
     def resolve_episode(root, info, episode: Episode) -> str:
 
         episode = Episode(episode)  # FIXME: this needs to happen in caller!
@@ -71,8 +62,6 @@ def test_enum_argument():
         return ({
             Episode.NEWHOPE: 'A new hope'
         }).get(episode, 'Unknown episode')
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{ episode (episode: NEWHOPE) }')
     assert result.errors is None
@@ -95,9 +84,9 @@ def test_base_scalars_output():
         'my_id': ID,
     })
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info) -> Example:
         return Example(
             my_str='Some string',
@@ -105,8 +94,6 @@ def test_base_scalars_output():
             my_float=3.14,
             my_bool=True,
             my_id='1234')
-
-    schema = Schema(query=Query)
 
     result = schema.execute(
         '{ example { myStr, myInt, myFloat, myBool, myId } }')
@@ -132,9 +119,9 @@ def test_base_scalars_input():
         'my_id': ID,
     })
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info) -> Example:
         return Example(
             my_str='Some string',
@@ -142,8 +129,6 @@ def test_base_scalars_input():
             my_float=3.14,
             my_bool=True,
             my_id='1234')
-
-    schema = Schema(query=Query)
 
     result = schema.execute(
         '{ example { myStr, myInt, myFloat, myBool, myId } }')
@@ -161,13 +146,11 @@ def test_base_scalars_input():
 
 def test_datetime_output():
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('my_datetime')
+    @schema.query.field('my_datetime')
     def resolve_my_datetime(root, info) -> datetime:
         return datetime(2018, 12, 11, 14, 28)
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{ myDatetime }')
 
@@ -177,13 +160,11 @@ def test_datetime_output():
 
 def test_datetime_input():
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('format_date')
+    @schema.query.field('format_date')
     def resolve_my_datetime(root, info, dt: datetime) -> str:
         return dt.strftime('%a %b %d, %Y %H:%M')
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{ formatDate (dt: "2018-12-11T14:28:00") }')
 
@@ -193,13 +174,11 @@ def test_datetime_input():
 
 def test_non_null_output_nulled():
 
-    Query = Object('Query')
+    schema = Schema()
 
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info) -> NonNull(str):
         return None  # Will fail
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{example}')
 
@@ -210,14 +189,11 @@ def test_non_null_output_nulled():
 
 
 def test_non_null_input_nulled():
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info, foo: str) -> bool:
         return foo is not None
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{example}')
 
@@ -229,14 +205,11 @@ def test_non_null_input_nulled():
 
 
 def test_non_null_input_provided():
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info, foo: str) -> bool:
         return foo is not None
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{example(foo:"BAR")}')
 
@@ -245,14 +218,11 @@ def test_non_null_input_provided():
 
 
 def test_list_output():
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('example')
+    @schema.query.field('example')
     def resolve_example(root, info) -> typing.List[str]:
         return ['foo', 'bar', 'baz']
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{example}')
 
@@ -261,14 +231,11 @@ def test_list_output():
 
 
 def test_list_input():
+    schema = Schema()
 
-    Query = Object('Query')
-
-    @Query.field('reverse')
+    @schema.query.field('reverse')
     def resolve_reverse(root, info, lst: typing.List[str]) -> typing.List[str]:
         return list(reversed(lst))
-
-    schema = Schema(query=Query)
 
     result = schema.execute('{reverse (lst: ["foo", "bar", "baz"])}')
 
