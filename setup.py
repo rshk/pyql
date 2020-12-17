@@ -16,7 +16,7 @@ if os.path.exists('CHANGELOG.rst'):
 INSTALL_REQUIRES = [
 
     # GraphQL schema definition
-    'graphql-core <3',
+    'graphql-core >= 3',
 
     # ISO8601 date parsing
     'aniso8601',
@@ -28,6 +28,7 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'sphinx',
+        'pdbpp',
     ],
 }
 
@@ -52,17 +53,10 @@ setup(
     # test_suite='tests',
     classifiers=[
         'License :: OSI Approved :: BSD License',
-
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3 :: Only',
-
-        # 'Programming Language :: Python :: Implementation :: CPython',
-        # 'Programming Language :: Python :: Implementation :: IronPython',
-        # 'Programming Language :: Python :: Implementation :: Jython',
-        # 'Programming Language :: Python :: Implementation :: PyPy',
-        # 'Programming Language :: Python :: Implementation :: Stackless',
+        'Programming Language :: Python :: 3.8',
     ],
     # entry_points={
     #     'console_scripts': ['PACKAGE_NAME=PACKAGE_NAME.cli:main'],

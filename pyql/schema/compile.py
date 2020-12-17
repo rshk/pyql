@@ -7,7 +7,7 @@ from typing import Any, Callable
 import graphql
 from graphql import (
     GraphQLArgument, GraphQLBoolean, GraphQLField, GraphQLFloat, GraphQLID,
-    GraphQLInputObjectField, GraphQLInputObjectType, GraphQLInt,
+    GraphQLInputField, GraphQLInputObjectType, GraphQLInt,
     GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType,
     GraphQLSchema, GraphQLString, GraphQLUnionType)
 
@@ -205,7 +205,7 @@ class GraphQLCompiler:
         compiled_type = GraphQLField(
             type_=self.get_graphql_type(field.type),
             args={},  # placeholder
-            resolver=_wrapped_resolver,
+            resolve=_wrapped_resolver,
             description=field.description,
             deprecation_reason=field.deprecation_reason)
 
@@ -221,10 +221,17 @@ class GraphQLCompiler:
     @cache_compiled_object
     def compile_argument(self, arg: Argument) -> GraphQLArgument:
         assert isinstance(arg, Argument)
+
+        arg_type = self.get_graphql_type(arg.type)
+
+        kwargs = {}
+        if not isinstance(arg_type, GraphQLNonNull):
+            kwargs['default_value'] = arg.default_value
+
         return GraphQLArgument(
-            type_=self.get_graphql_type(arg.type),
-            default_value=arg.default_value,
-            description=arg.description)
+            type_=arg_type,
+            description=arg.description,
+            **kwargs)
 
     @cache_compiled_object
     def compile_enum(self, enum: Enum) -> GraphQLEnumType:
@@ -265,7 +272,7 @@ class GraphQLCompiler:
             name=obj.name,
             fields={},  # placeholder
             description=obj.description,
-            container_type=create_container)
+            out_type=create_container)
 
         self.add_to_cache(obj, compiled_type)
 
@@ -278,11 +285,9 @@ class GraphQLCompiler:
         return compiled_type
 
     @cache_compiled_object
-    def compile_input_field(
-            self, field: InputField) -> GraphQLInputObjectField:
-
+    def compile_input_field(self, field: InputField) -> GraphQLInputField:
         assert isinstance(field, InputField)
-        return GraphQLInputObjectField(
+        return GraphQLInputField(
             type_=self.get_graphql_type(field.type),
             default_value=field.default_value,
             description=field.description,

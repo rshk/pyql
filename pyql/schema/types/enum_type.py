@@ -30,10 +30,10 @@ class GraphQLEnumType(_GraphQLNamedType):
         # Needed for introspection
         # NOTE: the actual value used in queries is ``name``; keys are
         # for internal use only.
-        return [
-            GraphQLEnumValue(value.value, name=value.value)
+        return {
+            str(value.value): GraphQLEnumValue(value.value)
             for key, value in self.get_values().items()
-        ]
+        }
 
     def get_values(self):
         return self._enum.__members__
@@ -73,10 +73,10 @@ class GraphQLEnumType(_GraphQLNamedType):
             value_ast: AST value
         """
 
-        if isinstance(value_ast, ast.EnumValue):
+        if isinstance(value_ast, ast.EnumValueNode):
             return self.get_value(value_ast.value)
 
-        if isinstance(value_ast, ast.IntValue):
+        if isinstance(value_ast, ast.IntValueNode):
             # We need this as there's no difference between an "enum
             # value" integer and an actual literal integer.
             # For strings we can be more strict, and won't accept

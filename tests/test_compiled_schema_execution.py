@@ -66,7 +66,7 @@ def test_resolver_cannot_return_different_container_instance():
     assert result.errors is not None
     assert len(result.errors) == 1
     assert result.errors[0].message == \
-        'Expected value of type "Foo" but got: Bar.'
+        "Expected value of type 'Foo' but got: <Bar instance>."
 
 
 def test_returning_an_incompatible_object_fails():
