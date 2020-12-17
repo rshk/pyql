@@ -221,10 +221,17 @@ class GraphQLCompiler:
     @cache_compiled_object
     def compile_argument(self, arg: Argument) -> GraphQLArgument:
         assert isinstance(arg, Argument)
+
+        arg_type = self.get_graphql_type(arg.type)
+
+        kwargs = {}
+        if not isinstance(arg_type, GraphQLNonNull):
+            kwargs['default_value'] = arg.default_value
+
         return GraphQLArgument(
-            type_=self.get_graphql_type(arg.type),
-            default_value=arg.default_value,
-            description=arg.description)
+            type_=arg_type,
+            description=arg.description,
+            **kwargs)
 
     @cache_compiled_object
     def compile_enum(self, enum: Enum) -> GraphQLEnumType:
