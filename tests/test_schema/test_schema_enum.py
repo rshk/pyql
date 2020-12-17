@@ -5,6 +5,12 @@ import pytest
 from pyql import Object, Schema
 
 
+class Color(Enum):
+    RED = 'red'
+    GREEN = 'green'
+    BLUE = 'blue'
+
+
 @pytest.fixture
 def sample_output_schema():
 

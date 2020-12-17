@@ -9,6 +9,18 @@ from enum import Enum
 from pyql import ID, NonNull, Object, Schema
 
 
+class Color(Enum):
+    RED = 'RED'
+    GREEN = 'GREEN'
+    BLUE = 'BLUE'
+
+
+class Episode(Enum):
+    NEWHOPE = 'NEWHOPE'
+    EMPIRE = 'EMPIRE'
+    JEDI = 'JEDI'
+
+
 def test_basic_schema():
     schema = Schema()
 
@@ -27,11 +39,6 @@ def test_basic_schema():
 
 def test_enum_output():
     """Return value from an Enum"""
-
-    class Color(Enum):
-        RED = 'RED'
-        GREEN = 'GREEN'
-        BLUE = 'BLUE'
 
     Card = Object('Card', fields={
         'name': str,
