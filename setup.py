@@ -28,6 +28,7 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'sphinx',
+        'pdbpp',
     ],
 }
 
