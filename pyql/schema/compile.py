@@ -280,7 +280,7 @@ class GraphQLCompiler:
     @cache_compiled_object
     def compile_input_field(self, field: InputField) -> GraphQLInputField:
         assert isinstance(field, InputField)
-        return GraphQLInputObjectField(
+        return GraphQLInputField(
             type_=self.get_graphql_type(field.type),
             default_value=field.default_value,
             description=field.description,
