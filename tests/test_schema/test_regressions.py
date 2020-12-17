@@ -1,5 +1,3 @@
-from graphql import graphql
-
 from pyql import Object, Schema
 
 
@@ -13,12 +11,11 @@ def test_arguments_are_converted_to_snake_case():
         return some_arg_name
 
     schema = Schema(query=Query)
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(
-        compiled, """
+    result = schema.execute(
+        """
         query ($arg: String!) {
             hello(someArgName: $arg)
         }
@@ -39,12 +36,11 @@ def test_optional_argument_can_be_omitted():
         return 'Hello {}'.format(some_arg)
 
     schema = Schema(query=Query)
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(
-        compiled, """
+    result = schema.execute(
+        """
         query {
             hello
         }
@@ -66,12 +62,11 @@ def test_optional_argument_can_be_none():
         return 'Hello {}'.format(some_arg)
 
     schema = Schema(query=Query)
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(
-        compiled, """
+    result = schema.execute(
+        """
         query {
             hello
         }

@@ -1,6 +1,6 @@
 from typing import List
 
-from graphql import GraphQLError, graphql
+from graphql import GraphQLError
 
 from pyql import Object, Schema
 
@@ -17,11 +17,9 @@ def test_create_basic_schema():
 
     schema.query = Query
 
-    compiled = schema.compile()
-
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{hello}')
+    result = schema.execute('{hello}')
 
     assert result.data == {'hello': 'Hello world'}
     assert result.errors is None
@@ -36,18 +34,17 @@ def test_simple_query_with_optional_argument():
         return 'Hello {}'.format(name)
 
     schema = Schema(query=Query)
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{hello}')
+    result = schema.execute('{hello}')
 
     assert result.data == {'hello': 'Hello world'}
     assert result.errors is None
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, """
+    result = schema.execute("""
     query hello($name: String!) {
         hello(name: $name)
     }
@@ -67,11 +64,10 @@ def test_simple_query_with_mandatory_argument():
         return 'Hello {}'.format(name)
 
     schema.query = Query
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{hello}')
+    result = schema.execute('{hello}')
 
     assert result.data is None
     assert len(result.errors) == 1
@@ -82,7 +78,7 @@ def test_simple_query_with_mandatory_argument():
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, """
+    result = schema.execute("""
     query hello($name: String!) {
         hello(name: $name)
     }
@@ -108,11 +104,10 @@ def test_schema_with_nested_objects():
         return Post(title='One', body='First post')
 
     schema.query = Query
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{post {title, body}}')
+    result = schema.execute('{post {title, body}}')
 
     assert result.data == {'post': {'title': 'One', 'body': 'First post'}}
     assert result.errors is None
@@ -137,11 +132,10 @@ def test_schema_with_nested_objects_list():
         ]
 
     schema.query = Query
-    compiled = schema.compile()
 
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{posts {title, body}}')
+    result = schema.execute('{posts {title, body}}')
 
     assert result.data == {'posts': [
         {'title': 'One', 'body': 'First post'},
@@ -158,11 +152,9 @@ def test_basic_schema_with_default_query_object():
     def resolve_hello(root, info) -> str:
         return 'Hello world'
 
-    compiled = schema.compile()
-
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{hello}')
+    result = schema.execute('{hello}')
 
     assert result.data == {'hello': 'Hello world'}
     assert result.errors is None
@@ -181,11 +173,9 @@ def test_omitted_fields_are_filled_with_none():
     def resolve_my_obj(root, info) -> MyObj:
         return MyObj(foo='FOO')
 
-    compiled = schema.compile()
-
     # ----------------------------------------------------------------
 
-    result = graphql(compiled, '{ myObj { foo, bar } }')
+    result = schema.execute('{ myObj { foo, bar } }')
 
     assert result.errors is None
     assert result.data == {'myObj': {'foo': 'FOO', 'bar': None}}
