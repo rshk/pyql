@@ -265,7 +265,7 @@ class GraphQLCompiler:
             name=obj.name,
             fields={},  # placeholder
             description=obj.description,
-            container_type=create_container)
+            out_type=create_container)
 
         self.add_to_cache(obj, compiled_type)
 
