@@ -199,8 +199,8 @@ def test_non_null_input_nulled():
 
     assert len(result.errors) == 1
     assert result.errors[0].message == (
-        'Field "example" argument "foo" of type "String!" '
-        'is required but not provided.')
+        "Field 'example' argument 'foo' of type 'String!' "
+        "is required, but it was not provided.")
     assert result.data is None
 
 

@@ -64,8 +64,9 @@ def test_simple_query_with_mandatory_argument():
     assert len(result.errors) == 1
     assert isinstance(result.errors[0], GraphQLError)
     assert result.errors[0].message == (
-        'Field "hello" argument "name" of type "String!" '
-        'is required but not provided.')
+        "Field 'hello' argument 'name' of type 'String!' "
+        "is required, but it was not provided."
+    )
 
     # ----------------------------------------------------------------
 
