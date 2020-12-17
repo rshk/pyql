@@ -30,10 +30,10 @@ class GraphQLEnumType(_GraphQLNamedType):
         # Needed for introspection
         # NOTE: the actual value used in queries is ``name``; keys are
         # for internal use only.
-        return [
-            GraphQLEnumValue(value.value, name=value.value)
+        return {
+            key: GraphQLEnumValue(value.value)
             for key, value in self.get_values().items()
-        ]
+        }
 
     def get_values(self):
         return self._enum.__members__
