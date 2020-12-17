@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-version = '1.3.0'
+version = '3.0.0'
 
 here = os.path.dirname(__file__)
 
@@ -57,6 +57,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
     # entry_points={
     #     'console_scripts': ['PACKAGE_NAME=PACKAGE_NAME.cli:main'],
