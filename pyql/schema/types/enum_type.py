@@ -73,10 +73,10 @@ class GraphQLEnumType(_GraphQLNamedType):
             value_ast: AST value
         """
 
-        if isinstance(value_ast, ast.EnumValue):
+        if isinstance(value_ast, ast.EnumValueNode):
             return self.get_value(value_ast.value)
 
-        if isinstance(value_ast, ast.IntValue):
+        if isinstance(value_ast, ast.IntValueNode):
             # We need this as there's no difference between an "enum
             # value" integer and an actual literal integer.
             # For strings we can be more strict, and won't accept

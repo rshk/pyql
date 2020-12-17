@@ -19,7 +19,7 @@ def datetime_serialize(dt):
 
 
 def datetime_parse_literal(node):
-    if isinstance(node, ast.StringValue):
+    if isinstance(node, ast.StringValueNode):
         return datetime_parse_value(node.value)
 
 
@@ -51,7 +51,7 @@ def date_serialize(date):
 
 
 def date_parse_literal(node):
-    if isinstance(node, ast.StringValue):
+    if isinstance(node, ast.StringValueNode):
         return date_parse_value(node.value)
 
 
@@ -81,7 +81,7 @@ def time_serialize(time):
 
 
 def time_parse_literal(node):
-    if isinstance(node, ast.StringValue):
+    if isinstance(node, ast.StringValueNode):
         return time_parse_value(node.value)
 
 
