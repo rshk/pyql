@@ -29,9 +29,9 @@ def test_enum_output():
     """Return value from an Enum"""
 
     class Color(Enum):
-        RED = 1
-        GREEN = 2
-        BLUE = 3
+        RED = 'RED'
+        GREEN = 'GREEN'
+        BLUE = 'BLUE'
 
     Card = Object('Card', fields={
         'name': str,
@@ -46,7 +46,7 @@ def test_enum_output():
 
     result = schema.execute('{ randomCard { name, color } }')
     assert result.errors is None
-    assert result.data == {'randomCard': {'name': 'Hello', 'color': 1}}
+    assert result.data == {'randomCard': {'name': 'Hello', 'color': 'RED'}}
 
 
 def test_enum_argument():

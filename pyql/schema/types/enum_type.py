@@ -31,7 +31,7 @@ class GraphQLEnumType(_GraphQLNamedType):
         # NOTE: the actual value used in queries is ``name``; keys are
         # for internal use only.
         return {
-            key: GraphQLEnumValue(value.value)
+            str(value.value): GraphQLEnumValue(value.value)
             for key, value in self.get_values().items()
         }
 
