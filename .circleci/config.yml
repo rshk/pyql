@@ -27,8 +27,7 @@ jobs:
       - run:
           name: install dependencies
           command: |
-            pip install pipenv
-            pipenv install -e '.[dev]'
+            pip install -e '.[dev]'
 
       - save_cache:
           paths:
@@ -71,6 +70,26 @@ jobs:
     docker:
       - image: circleci/python:3.6
 
+  black:
+
+    docker:
+      - image: circleci/python:3.8
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - run:
+          name: install dependencies
+          command: |
+            pip install -e '.[dev]'
+
+      - run:
+          name: run tests
+          command: |
+            black --check .
+
 
 workflows:
   version: 2
@@ -80,3 +99,4 @@ workflows:
       - 'test-python-3.8'
       - 'test-python-3.7'
       - 'test-python-3.6'
+      - 'black'
