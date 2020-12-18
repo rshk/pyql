@@ -6,7 +6,7 @@ def test_arguments_are_converted_to_snake_case():
 
     schema = Schema()
 
-    @schema.query.field('hello')
+    @schema.query.field("hello")
     def resolve_hello(root, info, some_arg_name: str) -> str:
         return some_arg_name
 
@@ -18,10 +18,11 @@ def test_arguments_are_converted_to_snake_case():
             hello(someArgName: $arg)
         }
         """,
-        variable_values={'arg': 'IT WORKS'})
+        variable_values={"arg": "IT WORKS"},
+    )
 
     assert result.errors is None
-    assert result.data == {'hello': 'IT WORKS'}
+    assert result.data == {"hello": "IT WORKS"}
 
 
 def test_optional_argument_can_be_omitted():
@@ -29,9 +30,9 @@ def test_optional_argument_can_be_omitted():
 
     schema = Schema()
 
-    @schema.query.field('hello')
-    def resolve_hello(root, info, some_arg: str = 'DEFAULT') -> str:
-        return 'Hello {}'.format(some_arg)
+    @schema.query.field("hello")
+    def resolve_hello(root, info, some_arg: str = "DEFAULT") -> str:
+        return "Hello {}".format(some_arg)
 
     # ----------------------------------------------------------------
 
@@ -40,10 +41,11 @@ def test_optional_argument_can_be_omitted():
         query {
             hello
         }
-        """)
+        """
+    )
 
     assert result.errors is None
-    assert result.data == {'hello': 'Hello DEFAULT'}
+    assert result.data == {"hello": "Hello DEFAULT"}
 
 
 def test_optional_argument_can_be_none():
@@ -51,11 +53,11 @@ def test_optional_argument_can_be_none():
 
     schema = Schema()
 
-    @schema.query.field('hello')
+    @schema.query.field("hello")
     def resolve_hello(root, info, some_arg: str = None) -> str:
         if some_arg is None:
-            return 'DEFAULT VALUE'
-        return 'Hello {}'.format(some_arg)
+            return "DEFAULT VALUE"
+        return "Hello {}".format(some_arg)
 
     # ----------------------------------------------------------------
 
@@ -64,7 +66,8 @@ def test_optional_argument_can_be_none():
         query {
             hello
         }
-        """)
+        """
+    )
 
     assert result.errors is None
-    assert result.data == {'hello': 'DEFAULT VALUE'}
+    assert result.data == {"hello": "DEFAULT VALUE"}

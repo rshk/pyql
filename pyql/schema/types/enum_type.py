@@ -13,8 +13,9 @@ class GraphQLEnumType(_GraphQLNamedType):
     # use metaclasses is never great..)
 
     def __init__(self, *, enum):
-        assert isinstance(enum, type) and issubclass(enum, Enum), (
-            'enum argument must be an Enum')
+        assert isinstance(enum, type) and issubclass(
+            enum, Enum
+        ), "enum argument must be an Enum"
         self._enum = enum
 
     @property
@@ -52,9 +53,7 @@ class GraphQLEnumType(_GraphQLNamedType):
         """
 
         if not isinstance(value, self._enum):
-            raise TypeError(
-                'Value must be an instance of Enum: {}'
-                .format(self._enum))
+            raise TypeError("Value must be an instance of Enum: {}".format(self._enum))
         return value.value
 
     def parse_value(self, value):
@@ -84,5 +83,7 @@ class GraphQLEnumType(_GraphQLNamedType):
             return self.get_value(int(value_ast.value))
 
         raise TypeError(
-            'Invalid input value for Enum {}: {}'
-            .format(repr(self._enum), repr(value_ast)))
+            "Invalid input value for Enum {}: {}".format(
+                repr(self._enum), repr(value_ast)
+            )
+        )
