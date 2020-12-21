@@ -17,12 +17,12 @@ def cached_property_OLD(fn):
 
 
 class cached_property(object):
-    """ A property that is only computed once per instance and then replaces
-        itself with an ordinary attribute. Deleting the attribute resets the
-        property.
+    """A property that is only computed once per instance and then replaces
+    itself with an ordinary attribute. Deleting the attribute resets the
+    property.
 
-        Source: https://github.com/bottlepy/bottle/commit/fa7733e0
-        """
+    Source: https://github.com/bottlepy/bottle/commit/fa7733e0
+    """
 
     def __init__(self, func):
         self.__doc__ = getattr(func, "__doc__")

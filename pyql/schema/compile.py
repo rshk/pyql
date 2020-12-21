@@ -6,14 +6,37 @@ from typing import Any, Callable
 
 import graphql
 from graphql import (
-    GraphQLArgument, GraphQLBoolean, GraphQLField, GraphQLFloat, GraphQLID,
-    GraphQLInputField, GraphQLInputObjectType, GraphQLInt,
-    GraphQLInterfaceType, GraphQLList, GraphQLNonNull, GraphQLObjectType,
-    GraphQLSchema, GraphQLString, GraphQLUnionType)
+    GraphQLArgument,
+    GraphQLBoolean,
+    GraphQLField,
+    GraphQLFloat,
+    GraphQLID,
+    GraphQLInputField,
+    GraphQLInputObjectType,
+    GraphQLInt,
+    GraphQLInterfaceType,
+    GraphQLList,
+    GraphQLNonNull,
+    GraphQLObjectType,
+    GraphQLSchema,
+    GraphQLString,
+    GraphQLUnionType,
+)
 
 from pyql.schema.types.core import (
-    ID, Argument, Field, InputField, InputObject, Interface, List, NonNull,
-    Object, ObjectContainer, Schema, Union)
+    ID,
+    Argument,
+    Field,
+    InputField,
+    InputObject,
+    Interface,
+    List,
+    NonNull,
+    Object,
+    ObjectContainer,
+    Schema,
+    Union,
+)
 from pyql.schema.types.enum_type import GraphQLEnumType
 from pyql.schema.types.extra import GraphQLDate, GraphQLDateTime, GraphQLTime
 from pyql.utils.str_converters import to_camel_case
@@ -29,11 +52,9 @@ DEFAULT_TYPE_MAP = {
     float: GraphQLFloat,
     bool: GraphQLBoolean,
     ID: GraphQLID,
-
     datetime.datetime: GraphQLDateTime,
     datetime.date: GraphQLDate,
     datetime.time: GraphQLTime,
-
     # TODO: support JSONString too? (Like Graphene does)
     # TODO: Provide an API to extend this mapping (?)
 }
@@ -56,7 +77,6 @@ class GraphQLCompiler:
         self._cache[obj] = compiled_type
 
     def cache_compiled_object(fn: Callable) -> Any:
-
         @functools.wraps(fn)
         def wrapped(self, obj):
             result = self.get_from_cache(obj)
@@ -73,7 +93,8 @@ class GraphQLCompiler:
             mutation=self._compile_object_or_none(schema.mutation),
             subscription=self._compile_object_or_none(schema.subscription),
             directives=schema.directives,
-            types=self._compile_schema_types(schema.types))
+            types=self._compile_schema_types(schema.types),
+        )
 
     def _compile_object_or_none(self, obj):
         if obj is None:
@@ -108,14 +129,11 @@ class GraphQLCompiler:
                 return True
 
         compiled_type = GraphQLObjectType(
-
             # Object names are in CamelCase both in Python and GraphQL,
             # so no need for conversion here.
             name=obj.name,
-
             is_type_of=is_type_of,
             description=obj.description,
-
             fields={},  # placeholder
             interfaces=[],  # placeholder
         )
@@ -130,9 +148,11 @@ class GraphQLCompiler:
             for name, field in obj.fields.items()
         }
 
-        compiled_type.interfaces = [
-            self.compile_interface(x) for x in obj.interfaces
-        ] if obj.interfaces else []
+        compiled_type.interfaces = (
+            [self.compile_interface(x) for x in obj.interfaces]
+            if obj.interfaces
+            else []
+        )
 
         return compiled_type
 
@@ -140,18 +160,15 @@ class GraphQLCompiler:
     def compile_interface(self, obj: Interface) -> GraphQLInterfaceType:
         assert isinstance(obj, Interface)
         compiled_type = GraphQLInterfaceType(
-
             # Object names are in CamelCase both in Python and GraphQL,
             # so no need for conversion here.
             name=obj.name,
-
             fields={},  # placeholder
-
             # TODO: do we need to wrap this, so we can convert types
             #       on the fly?
             resolve_type=obj.resolve_type,
-
-            description=obj.description)
+            description=obj.description,
+        )
 
         self.add_to_cache(obj, compiled_type)
 
@@ -164,8 +181,7 @@ class GraphQLCompiler:
 
     @cache_compiled_object
     def compile_field(self, field: Field) -> GraphQLField:
-        assert isinstance(field, Field), \
-            'Expected Field, got {}'.format(repr(field))
+        assert isinstance(field, Field), "Expected Field, got {}".format(repr(field))
 
         _arg_names = field.args.keys() if field.args else []
 
@@ -174,13 +190,11 @@ class GraphQLCompiler:
         # are in snake_case, which might not always be the case.
 
         ARG_NAMES_PYTHON_TO_GQL = {
-            py_name: _name_to_graphql(py_name)
-            for py_name in _arg_names
+            py_name: _name_to_graphql(py_name) for py_name in _arg_names
         }
 
         ARG_NAMES_GQL_TO_PYTHON = {
-            gql_name: py_name
-            for py_name, gql_name in ARG_NAMES_PYTHON_TO_GQL.items()
+            gql_name: py_name for py_name, gql_name in ARG_NAMES_PYTHON_TO_GQL.items()
         }
 
         @functools.wraps(field.resolver)
@@ -207,14 +221,19 @@ class GraphQLCompiler:
             args={},  # placeholder
             resolve=_wrapped_resolver,
             description=field.description,
-            deprecation_reason=field.deprecation_reason)
+            deprecation_reason=field.deprecation_reason,
+        )
 
         self.add_to_cache(field, compiled_type)
 
-        compiled_type.args = {
-            ARG_NAMES_PYTHON_TO_GQL[name]: self.compile_argument(arg)
-            for name, arg in field.args.items()
-        } if field.args else {}
+        compiled_type.args = (
+            {
+                ARG_NAMES_PYTHON_TO_GQL[name]: self.compile_argument(arg)
+                for name, arg in field.args.items()
+            }
+            if field.args
+            else {}
+        )
 
         return compiled_type
 
@@ -226,12 +245,9 @@ class GraphQLCompiler:
 
         kwargs = {}
         if not isinstance(arg_type, GraphQLNonNull):
-            kwargs['default_value'] = arg.default_value
+            kwargs["default_value"] = arg.default_value
 
-        return GraphQLArgument(
-            type_=arg_type,
-            description=arg.description,
-            **kwargs)
+        return GraphQLArgument(type_=arg_type, description=arg.description, **kwargs)
 
     @cache_compiled_object
     def compile_enum(self, enum: Enum) -> GraphQLEnumType:
@@ -249,13 +265,11 @@ class GraphQLCompiler:
         # NOTE: see note about name conversion in compile_field()
 
         FIELD_NAMES_PYTHON_TO_GQL = {
-            py_name: _name_to_graphql(py_name)
-            for py_name in obj.fields.keys()
+            py_name: _name_to_graphql(py_name) for py_name in obj.fields.keys()
         }
 
         FIELD_NAMES_GQL_TO_PYTHON = {
-            gql_name: py_name
-            for py_name, gql_name in FIELD_NAMES_PYTHON_TO_GQL.items()
+            gql_name: py_name for py_name, gql_name in FIELD_NAMES_PYTHON_TO_GQL.items()
         }
 
         # Create an instance of the object that will be passed as argument
@@ -263,22 +277,24 @@ class GraphQLCompiler:
         # We need to convert names to their original form (usually
         # snake_case).
         def create_container(arg):
-            return obj.container_type(**{
-                FIELD_NAMES_GQL_TO_PYTHON[name]: value
-                for name, value in arg.items()
-            })
+            return obj.container_type(
+                **{
+                    FIELD_NAMES_GQL_TO_PYTHON[name]: value
+                    for name, value in arg.items()
+                }
+            )
 
         compiled_type = GraphQLInputObjectType(
             name=obj.name,
             fields={},  # placeholder
             description=obj.description,
-            out_type=create_container)
+            out_type=create_container,
+        )
 
         self.add_to_cache(obj, compiled_type)
 
         compiled_type.fields = {
-            FIELD_NAMES_PYTHON_TO_GQL[name]:
-            self.compile_input_field(field)
+            FIELD_NAMES_PYTHON_TO_GQL[name]: self.compile_input_field(field)
             for name, field in obj.fields.items()
         }
 
@@ -291,21 +307,21 @@ class GraphQLCompiler:
             type_=self.get_graphql_type(field.type),
             default_value=field.default_value,
             description=field.description,
-            out_name=field.out_name)
+            out_name=field.out_name,
+        )
 
     @cache_compiled_object
     def compile_union(self, union: Union) -> GraphQLUnionType:
         assert isinstance(union, Union)
         return GraphQLUnionType(
             name=union.name,
-            types=tuple(
-                self.get_graphql_type(t) for t in union.types),
+            types=tuple(self.get_graphql_type(t) for t in union.types),
             resolve_type=union.resolve_type,
-            description=union.description)
+            description=union.description,
+        )
 
     def get_graphql_type(self, pytype):
-        """Resolve a Python type to equivalent GraphQL type
-        """
+        """Resolve a Python type to equivalent GraphQL type"""
 
         if isinstance(pytype, Object):
             return self.compile_object(pytype)
@@ -351,9 +367,9 @@ class GraphQLCompiler:
         #
         # Search for a better alternative is under way.
         # ----------------------------------------------------------------
-        pytype_origin = getattr(pytype, '__origin__', None)
+        pytype_origin = getattr(pytype, "__origin__", None)
         if pytype_origin is list or pytype_origin is typing.List:
-            arg, = pytype.__args__
+            (arg,) = pytype.__args__
             return GraphQLList(self.get_graphql_type(arg))
 
         # TODO: support typing.Union type too!
@@ -362,9 +378,7 @@ class GraphQLCompiler:
         if isinstance(pytype, type) and issubclass(pytype, Enum):
             return self.compile_enum(pytype)
 
-        raise TypeError(
-            'Unable to map Python type to GraphQL: %s',
-            repr(pytype))
+        raise TypeError("Unable to map Python type to GraphQL: %s", repr(pytype))
 
 
 def _name_to_graphql(name):
